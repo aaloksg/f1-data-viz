@@ -1,0 +1,7 @@
+Font family of slider texts
+
+Font colour scheme of slider texts.
+
+Reference slider - https://github.com/johnwalley/d3-simple-slider
+
+Issue with last label overlap with pointer label-- cause by opacity!!
