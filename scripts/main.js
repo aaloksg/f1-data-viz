@@ -13,9 +13,11 @@ F1DataVis.main = function () {
 
     var mainDiv = document.getElementById('mainDiv'),
         sliderMargin = { left: 100, right: 100, top: 20, bottom: 20 },
-        sliderYPos = 500;
-
+        sliderYPos;
+    mainDiv.style.height = window.innerHeight - 20 + 'px';
     mainDiv.appendChild(F1DataVis.parentSvg);
+
+    sliderYPos = window.innerHeight - 20 - 100;
 
     // Year range
     var years = d3.range(1950, 2019), width = window.innerWidth;
