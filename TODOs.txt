@@ -5,3 +5,18 @@ Font colour scheme of slider texts.
 Reference slider - https://github.com/johnwalley/d3-simple-slider
 
 Issue with last label overlap with pointer label-- cause by opacity!!
+
+Data to use-
+
+- constructors - team ids
+- constructorstandings id - team positions for races, team id vs race id
+- drivers - driver info
+- driverstandings - driver positions for races, driver id vs race id
+- laptimes - driver vs race and race info vs lap positions
+- races - race id vs name and circuit info
+- results - race id vs driver id vs team id
+
+	~ status - status id info 
+
+	? qualifying - driver vs race vs team id
+	? circuits - circuit info
