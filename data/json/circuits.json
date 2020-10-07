@@ -1,4 +1,4 @@
-[
+var F1DataVis = F1DataVis || {}; F1DataVis.data = F1DataVis.data || {}; F1DataVis.data.circuits = [
   {
     "circuitId": 1,
     "circuitRef": "albert_park",
