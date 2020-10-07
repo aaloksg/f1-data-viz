@@ -62,7 +62,7 @@ F1DataVis.main = function () {
         //.attr('font-style', 'italic')
         .attr('font-weight', 'bold')
         .attr('font-family', 'bahnschrift')
-        .attr('y', -27)
+        .attr('y', -31)
         .attr('fill', '#E70000');
 
     // Change slider size.
@@ -74,6 +74,14 @@ F1DataVis.main = function () {
         .selectAll('.track-inset')
         .attr('stroke-width', 7)
         .attr('stroke', '#005AD4');
+    d3.select('#' + F1DataVis.IdStore.parentSvg)
+        .selectAll('.handle')
+        .attr('stroke-width', 3)
+        .attr('fill', 'silver')
+        .attr('stroke', 'red')
+        .attr('d', 'M-6.5,-6.5 v 15 l 6,7.5 l 6,-7.5 v -15 z');
+
+        
 
 
 }();
