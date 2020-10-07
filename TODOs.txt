@@ -20,3 +20,5 @@ Data to use-
 
 	? qualifying - driver vs race vs team id
 	? circuits - circuit info
+
+- Get the year range from JSON data.
