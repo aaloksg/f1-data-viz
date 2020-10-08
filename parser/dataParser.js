@@ -8,7 +8,7 @@ var dataParser = function () {
                 this.downloadJSON(results.data, file.name);
             }.bind(this),
             dynamicTyping: function (headerName) {
-                var numericalHeaders = ['circuitId', 'lat', 'lng', 'alt', 'raceId', 'year', 'round', 'constructorId', 'driverId', 'number', 'driverStandingsId', 'points', 'position', 'wins', 'constructorStandingsId', 'resultId', 'grid', 'positionOrder', 'laps', 'fastestLap', 'milliseconds', 'rank', 'fastestLapSpeed', 'statusId', 'lap'];
+                var numericalHeaders = ['circuitId', 'lat', 'lng', 'alt', 'raceId', 'year', 'round', 'constructorId', 'driverId', 'number', 'driverStandingsId', 'points', 'position', 'wins', 'constructorStandingsId', 'resultId', 'grid', 'positionOrder', 'laps', 'fastestLap', 'milliseconds', 'rank', 'fastestLapSpeed', 'statusId', 'lap', 'statusId'];
                 return numericalHeaders.indexOf(headerName) >= 0;
             }
         });
