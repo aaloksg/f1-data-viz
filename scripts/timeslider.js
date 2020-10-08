@@ -74,7 +74,8 @@ F1DataVis.timeSlider = function ( parent, visualizer, yPos ) {
             .width( _visualizer.width - _marginProps.left - _marginProps.right )
             .tickFormat( d3.format( '' ) )
             .tickValues( d3.range( 1950, 2019, 5 ).concat( [d3.max( _years )] ) )
-            .default( d3.max( _years ) );
+            .default( d3.max( _years ) )
+            .on( 'end', _visualizer.sliderMoved);
 
         // Append slider
         _sliderGroup.call( _timeSlider );

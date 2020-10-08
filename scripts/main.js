@@ -12,6 +12,7 @@ F1DataVis.handler.onresize = function () {
 }
 
 F1DataVis.handler.main = function () {
+    F1DataVis.dataHandler.initializeData();
 
     // Create parent SVG
     var parentSvg = document.createElementNS( "http://www.w3.org/2000/svg", "svg" );

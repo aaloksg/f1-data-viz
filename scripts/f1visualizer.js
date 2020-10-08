@@ -1,7 +1,9 @@
 var F1DataVis = F1DataVis || {};
 F1DataVis.IdStore = F1DataVis.IdStore || {};
 
-F1DataVis.f1Visualizer = function (parentSvg) {
+F1DataVis.f1Visualizer = function ( parentSvg ) {
+    var self = this;
+
     this.parentSvg = parentSvg;
 
 
@@ -24,5 +26,11 @@ F1DataVis.f1Visualizer = function (parentSvg) {
             this.height = height;
             this.slider.update();
         }
+    };
+
+    this.sliderMoved = function ( year ) {
+        console.log( 'slider value changed to - ' + year );
+        var raceIds = F1DataVis.dataHandler.getRaceIdsInYear( year );
+        console.log( 'RaceIds - ' + raceIds );
     };
 }
