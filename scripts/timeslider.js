@@ -3,8 +3,10 @@ F1DataVis.IdStore = F1DataVis.IdStore || {};
 
 F1DataVis.IdStore.sliderParent = 'sliderGrp';
 
-F1DataVis.timeSlider = function ( parent, visualizer, yPos ) {
-    var _yPosition = yPos,
+F1DataVis.timeSlider = function ( parent, visualizer ) {
+    var _height = 0,
+        _yPos = 0,
+        _xPos = 0,
         _parent = parent,
         _visualizer = visualizer,
         _marginProps = { left: 100, right: 100, top: 20, bottom: 20 },
@@ -57,13 +59,15 @@ F1DataVis.timeSlider = function ( parent, visualizer, yPos ) {
 
         };
 
+    this.yPosition = 0;
+    this.xPosition = 0;
+
     this.draw = function () {
 
         // Create group for slider and append to main svg
         _sliderGroup = d3.select( _parent )
             .append( 'g' )
-            .attr( 'id', F1DataVis.IdStore.sliderParent )
-            .attr( 'transform', 'translate(' + _marginProps.left + ',' + _yPosition + ')' );
+            .attr( 'id', F1DataVis.IdStore.sliderParent );
 
         // Create slider.
         _timeSlider = d3
@@ -81,6 +85,14 @@ F1DataVis.timeSlider = function ( parent, visualizer, yPos ) {
         _sliderGroup.call( _timeSlider );
 
         _tweakSliderLook();
+
+        _height = _sliderGroup._groups[0][0].getBBox().height;
+        this.yPosition = _visualizer.height - _height - _marginProps.bottom - _marginProps.top;
+
+        _yPos = this.yPosition + _marginProps.top + _height / 2;
+        _xPos = this.xPosition + _marginProps.left;
+        _sliderGroup.attr( 'transform', 'translate(' + _xPos + ',' + _yPos + ')' );
+
     };
 
     this.update = function () {
@@ -88,6 +100,6 @@ F1DataVis.timeSlider = function ( parent, visualizer, yPos ) {
         _timeSlider
             .width( width - _marginProps.left - _marginProps.right );
         _sliderGroup
-            .attr( 'transform', 'translate(' + _marginProps.left + ',' + _yPosition + ')' );
+            .attr( 'transform', 'translate(' + _xPos + ',' + _yPos + ')' );
     };
 }
