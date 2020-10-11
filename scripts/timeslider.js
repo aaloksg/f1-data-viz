@@ -72,14 +72,14 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
         // Create slider.
         _timeSlider = d3
             .sliderBottom()
-            .min( d3.min( _years ) )
-            .max( d3.max( _years ) )
+            .min( 1960 ) // Corrcet constructorStandings data doesn't exist for years < 1969 and 2018.
+            .max( 2017 )
             .step( 1 )
             .width( _visualizer.width - _marginProps.left - _marginProps.right )
             .tickFormat( d3.format( '' ) )
-            .tickValues( d3.range( 1950, 2019, 5 ).concat( [d3.max( _years )] ) )
-            .default( 2017 )
-            .on( 'end', _visualizer.sliderMoved);
+            .tickValues( d3.range( 1960, 2018, 5 ))//.concat( [2017] ) )
+            .default( 1970 )
+            .on( 'onchange', _visualizer.sliderMoved);
 
         // Append slider
         _sliderGroup.call( _timeSlider );

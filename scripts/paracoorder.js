@@ -1,50 +1,100 @@
 var F1DataVis = F1DataVis || {};
 F1DataVis.IdStore = F1DataVis.IdStore || {};
+F1DataVis.IdStore.paracoordHolder = 'paracoordHolderGrp'
 
 F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     var self = this,
-    _svgParent = svgParent,
+        _svgParent = svgParent,
+        _paracoordHolder,
         _visualizer = visualizer,
         _marginProps = { left: 150, top: 20, right: 100, bottom: 20 },
         _scales = new Map(),
-        _getXPosition;
+        _getXPosition,
+        _displayedYear,
+        _transitionSpeed = 2000;
 
     this.width = 0;
     this.height = 0;
     this.left = 0;
     this.top = 0;
+    this.seasonalGrp = {};
 
     this.initialize = function ( width, height ) {
         this.width = width;
         this.height = height;
+        _paracoordHolder = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
+        _paracoordHolder.setAttributeNS( null, 'id', F1DataVis.IdStore.paracoordHolder );
+        _svgParent.appendChild( _paracoordHolder );
     };
 
     this.draw = function ( year ) {
-        var races = F1DataVis.data.racesByYear[year], numberOfRaces = races.length, teams = F1DataVis.dataHandler.getTeamsInSeason( year ), numberOfTeams = teams.length;
+        var races = F1DataVis.data.racesByYear[year], numberOfRaces = races.length, teams = F1DataVis.dataHandler.getTeamsInSeason( year ), numberOfTeams = teams.length, negator;
 
-        _getXPosition = d3.scalePoint( d3.range( 1, numberOfRaces + 1 ), [_marginProps.left, this.width - _marginProps.right] );
+        if ( _displayedYear ) {
+            // translate this out
+            if ( _displayedYear < year ) {
+                negator = -1;
+            } else {
+                negator = 1;
+            }
+            this.seasonalGrp[_displayedYear]
+                .transition()
+                .duration( _transitionSpeed )
+                .attr( 'transform', 'translate(' + ( this.width * 1.5 * negator ) + ',0)' );
+        }
 
-        races.forEach( function ( race ) {
-            _scales.set(
+        _displayedYear = year; // set year to be displayed
+
+        if ( this.seasonalGrp[year] ) {
+            // translate this in if group already exists.
+            this.seasonalGrp[_displayedYear]
+                .transition()
+                .duration( _transitionSpeed )
+                .attr( 'transform', 'translate(0,0)' );
+        } else { // Create the group for the displayed year.
+            _getXPosition = d3.scalePoint( d3.range( 1, numberOfRaces + 1 ), [_marginProps.left, this.width - _marginProps.right] );
+
+            races.forEach( function ( race ) {
+                _scales.set(
                     race.round,
-                d3.scaleOrdinal()
-                    .range( d3.range( _marginProps.top, self.height - _marginProps.bottom, ( self.height - _marginProps.bottom - _marginProps.top ) / numberOfTeams ) )
-                    .domain( d3.range( 1, numberOfTeams + 1 ) )
+                    d3.scaleOrdinal()
+                        .range( d3.range( _marginProps.top, self.height - _marginProps.bottom + 1, ( self.height - _marginProps.bottom - _marginProps.top ) / ( numberOfTeams - 1 ) ) )
+                        .domain( d3.range( 1, numberOfTeams + 1 ) )
                 );
-        } );
-        this.drawAxes( year, races );
+            } );
+
+            this.drawAxes( year, races, negator );
+        }
     };
 
-    this.drawAxes = function ( year, races ) {
-        var axes = d3.select(_svgParent)
+    this.drawAxes = function ( year, races, negator ) {
+        this.seasonalGrp[year] = d3.select( _paracoordHolder )
             .append( "g" )
-            .attr( 'id', 'group_' + year)
+            .attr( 'id', 'group_' + year );
+
+        // Translate in the year from the correct side.
+        this.seasonalGrp[year]
+            .attr( 'transform', 'translate(' + ( this.width * 1.5 * -negator ) + ',0)' )
+            .transition()
+            .duration( _transitionSpeed )
+            .attr( 'transform', 'translate(0,0)' );
+
+        this.seasonalGrp[year]
             .selectAll( "g" )
             .data( races )
             .join( "g" )
+            .attr('id', race => 'Year_' + year + '_Round_' + race.round )
             .attr( "transform", race => `translate(${_getXPosition( race.round )},0)` )
-            .each( function ( race ) {
-                d3.select( this ).call( d3.axisRight( _scales.get( race.round ) ) );
+            .each( function ( race, index ) {
+                // Drawing lines for axes.
+                if ( index === races.length - 1 ) {
+                    d3.select( this ).call( d3.axisRight( _scales.get( race.round ) ) );
+                } else {
+                    d3.select(this)
+                        .append("path")
+                        .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]]))
+                        .attr("stroke", "black");
+                }
                 d3.select( this )
                     .append( "text" )
                     .attr( "x", 0 )
