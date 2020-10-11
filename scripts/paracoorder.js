@@ -28,7 +28,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.draw = function ( year ) {
-        var races = F1DataVis.data.racesByYear[year], numberOfRaces = races.length, teams = F1DataVis.dataHandler.getTeamsInSeason( year ), numberOfTeams = teams.length, negator;
+        var races, numberOfRaces, teams, numberOfTeams, negator, orderedTeams, verticalAxisRange, verticalAxisDomain;
 
         if ( _displayedYear ) {
             // translate this out
@@ -51,15 +51,43 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .transition()
                 .duration( _transitionSpeed )
                 .attr( 'transform', 'translate(0,0)' );
-        } else { // Create the group for the displayed year.
-            _getXPosition = d3.scalePoint( d3.range( 1, numberOfRaces + 1 ), [_marginProps.left, this.width - _marginProps.right] );
+        } else {
+            // Create the group for the displayed year.
+            races = F1DataVis.data.racesByYear[year];
+            numberOfRaces = races.length;
+            teams = F1DataVis.dataHandler.getTeamsInSeason( year );
+            numberOfTeams = teams.length;
+
+            // Sort teams alphabetically.
+            orderedTeams = teams.map( teamId => F1DataVis.dataHandler.getTeamsByID( teamId ) )
+                .sort( ( teamA, teamB ) => {
+                    if ( teamA.name < teamB.name ) {
+                        return -1;
+                    } else if ( teamA.name > teamB.name ) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                } );
+
+            _getXPosition = d3.scalePoint( d3.range( 0, numberOfRaces + 1 ), [_marginProps.left, this.width - _marginProps.right] );
+
+            verticalAxisRange = d3.range( _marginProps.top, self.height - _marginProps.bottom + 1, ( self.height - _marginProps.bottom - _marginProps.top ) / ( numberOfTeams - 1 ) );
+            verticalAxisDomain = d3.range( 1, numberOfTeams + 1 );
+
+            _scales.set(
+                0,
+                d3.scaleOrdinal()
+                    .range( verticalAxisRange )
+                    .domain( orderedTeams.map(team => team.name) )
+            );
 
             races.forEach( function ( race ) {
                 _scales.set(
                     race.round,
                     d3.scaleOrdinal()
-                        .range( d3.range( _marginProps.top, self.height - _marginProps.bottom + 1, ( self.height - _marginProps.bottom - _marginProps.top ) / ( numberOfTeams - 1 ) ) )
-                        .domain( d3.range( 1, numberOfTeams + 1 ) )
+                        .range( verticalAxisRange )
+                        .domain( verticalAxisDomain )
                 );
             } );
 
@@ -81,13 +109,15 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
 
         this.seasonalGrp[year]
             .selectAll( "g" )
-            .data( races )
+            .data( [{round: 0, name: 'Teams' }].concat( races) )
             .join( "g" )
             .attr('id', race => 'Year_' + year + '_Round_' + race.round )
             .attr( "transform", race => `translate(${_getXPosition( race.round )},0)` )
             .each( function ( race, index ) {
                 // Drawing lines for axes.
-                if ( index === races.length - 1 ) {
+                if ( index === 0 ) {
+                    d3.select( this ).call( d3.axisLeft( _scales.get( race.round ) ) );
+                } else if ( index === races.length ) {
                     d3.select( this ).call( d3.axisRight( _scales.get( race.round ) ) );
                 } else {
                     d3.select(this)
@@ -104,6 +134,8 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     .attr( "text-anchor", "middle" )
                     .text( race.name );
             } );
+
+        //
     };
 
     this.getYCoordinate = function ( round, position ) {
