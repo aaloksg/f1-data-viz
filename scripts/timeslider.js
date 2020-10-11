@@ -78,7 +78,7 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
             .width( _visualizer.width - _marginProps.left - _marginProps.right )
             .tickFormat( d3.format( '' ) )
             .tickValues( d3.range( 1950, 2019, 5 ).concat( [d3.max( _years )] ) )
-            .default( d3.max( _years ) )
+            .default( 2017 )
             .on( 'end', _visualizer.sliderMoved);
 
         // Append slider
@@ -102,4 +102,8 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
         _sliderGroup
             .attr( 'transform', 'translate(' + _xPos + ',' + _yPos + ')' );
     };
+
+    this.getValue = function () {
+        return _timeSlider.value();
+    }
 }

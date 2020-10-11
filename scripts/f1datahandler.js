@@ -34,7 +34,6 @@ F1DataVis.dataHandler.createCnstrctrStndgsByRaceIds = function ( year ) {
     var raceIds = F1DataVis.dataHandler.getRaceIdsInYear( year );
     var count = 0, length, i, j, raceId, jump = 5, lowerBound, upperBound;
     length = F1DataVis.data.constructorStandings.length;
-
     if ( F1DataVis.data.constructorStandings ) {
         for ( i = 0; i < length; i = i + jump ) {
             item = F1DataVis.data.constructorStandings[i];

@@ -24,3 +24,11 @@ Data to use-
 - Get the year range from JSON data.
 
 - F1DataVis.data.constructorStandingsByRaceId (use this)
+
+- Number of races in a year - F1DataVis.data.racesByYear[year].length  ---- x axis coordinate calc
+
+- F1DataVis.data.teamIdsByYear[year].length gives the number of teams. ---- y axis coordinate calc
+
+- Get team details -> F1DataVis.dataHandler.getTeamsByID(teamId) ---- Text for axes
+
+- Get standings information of a race ->  F1DataVis.data.constructorStandingsByRaceId[raceId] ---- Get position of team by iterating and matching constructorId
