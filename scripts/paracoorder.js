@@ -47,7 +47,8 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
 
         if ( this.seasonalGrp[year] ) {
             // translate this in if group already exists.
-            this.seasonalGrp[_displayedYear]
+            this.seasonalGrp[year]
+                .attr( 'transform', 'translate(' + ( this.width * 1.5 * -negator ) + ',0)' ) // Translate in the year from the correct side.
                 .transition()
                 .duration( _transitionSpeed )
                 .attr( 'transform', 'translate(0,0)' );
