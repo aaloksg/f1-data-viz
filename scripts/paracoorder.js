@@ -79,6 +79,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             _scales.set(
                 0,
                 d3.scaleOrdinal()
+<<<<<<< Updated upstream
                     .range( verticalAxisRange )
                     .domain( orderedTeams.map(team => team.name) )
             );
@@ -89,6 +90,10 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     d3.scaleOrdinal()
                         .range( verticalAxisRange )
                         .domain( verticalAxisDomain )
+=======
+                    .range( d3.range( _marginProps.top, self.height - _marginProps.bottom + 1, ( self.height - _marginProps.bottom - _marginProps.top ) / numberOfTeams - 1 ) )
+                    .domain( d3.range( 1, numberOfTeams + 1 ) )
+>>>>>>> Stashed changes
                 );
             } );
 
@@ -128,12 +133,20 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 }
                 d3.select( this )
                     .append( "text" )
-                    .attr( "x", 0 )
-                    .attr( "y", self.height - _marginProps.bottom )
-                    .attr( 'font-size', 10 )
-                    .attr( "fill", "black" )
-                    .attr( "text-anchor", "middle" )
-                    .text( race.name );
+                        .attr( "x", 0 )
+                        .attr( "y", self.height - _marginProps.bottom )
+                        .attr( 'font-size', 10 )
+                        .attr( "fill", "black" )
+                        .attr( "text-anchor", "middle" )
+                        .text( race.name.split( ' ' )[ 0 ] )
+                d3.select( this )
+                    .append( "text" )
+                        .attr( "x", 0 )
+                        .attr( "y", self.height - _marginProps.bottom + 15 )
+                        .attr( 'font-size', 10 )
+                        .attr( "fill", "black" )
+                        .attr( "text-anchor", "middle" )
+                        .text( race.name.split( ' ' )[ 1 ] );
             } );
 
         //
