@@ -32,3 +32,9 @@ Data to use-
 - Get team details -> F1DataVis.dataHandler.getTeamsByID(teamId) ---- Text for axes
 
 - Get standings information of a race ->  F1DataVis.data.constructorStandingsByRaceId[raceId] ---- Get position of team by iterating and matching constructorId
+
+- Position texts - ankith
+- Polyline drawing
+- Stylize lines
+- Stylize fonts
+- 

@@ -7,7 +7,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _svgParent = svgParent,
         _paracoordHolder,
         _visualizer = visualizer,
-        _marginProps = { left: 150, top: 20, right: 100, bottom: 20 },
+        _marginProps = { left: 120, top: 20, right: 100, bottom: 20 },
         _scales = new Map(),
         _getXPosition,
         _displayedYear,
@@ -28,7 +28,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.draw = function ( year ) {
-        var races, numberOfRaces, teams, numberOfTeams, negator, orderedTeams, verticalAxisRange, verticalAxisDomain;
+        var races, numberOfRaces, teams, numberOfTeams, negator = 0, orderedTeams, verticalAxisRange, verticalAxisDomain;
 
         if ( _displayedYear ) {
             // translate this out
@@ -148,14 +148,11 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         .attr( "text-anchor", "middle" )
                         .text( race.name.split( ' ' )[ 1 ] );
             } );
-
-        //
     };
 
     this.getYCoordinate = function ( round, position ) {
         return _scales.get(round)( position );
     };
-
 
     this.update = function ( width, height ) {
         if ( this.width !== width || this.height !== height ) {
