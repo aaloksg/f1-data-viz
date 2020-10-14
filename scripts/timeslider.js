@@ -15,7 +15,7 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
         _timeSlider = null,
 
         // Year range
-        _years = d3.range( 1950, 2019 ),
+        _years = d3.range( 1996, 2017 ),
 
         _tweakSliderLook = function () {
             // Modify the slider styles.
@@ -55,7 +55,9 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
                 .attr( 'stroke-width', 3 )
                 .attr( 'fill', 'silver' )
                 .attr( 'stroke', 'red' )
-                .attr( 'd', 'M-6.5,-6.5 v 15 l 6,7.5 l 6,-7.5 v -15 z' );
+                .attr( 'd', 'M-6.5,-6.5 v 15 l 6,7.5 l 6,-7.5 v -15 z' )
+                .attr( 'tabindex', null )
+                .on( 'click', _visualizer.onSliderHandleClicked ); // Remove tabindex to make it unselectable.
 
         };
 
@@ -72,13 +74,13 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
         // Create slider.
         _timeSlider = d3
             .sliderBottom()
-            .min( 1960 ) // Corrcet constructorStandings data doesn't exist for years < 1969 and 2018.
+            .min( 1996 ) // Corrcet constructorStandings data doesn't exist for years < 1969 and 2018.
             .max( 2017 )
             .step( 1 )
             .width( _visualizer.width - _marginProps.left - _marginProps.right )
             .tickFormat( d3.format( '' ) )
-            .tickValues( d3.range( 1960, 2018, 5 ))//.concat( [2017] ) )
-            .default( 1970 )
+            .tickValues( d3.range( 1996, 2018, 5 ))//.concat( [2017] ) )
+            .default( 2017 )
             .on( 'onchange', _visualizer.sliderMoved);
 
         // Append slider
@@ -105,5 +107,5 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
 
     this.getValue = function () {
         return _timeSlider.value();
-    }
+    };
 }
