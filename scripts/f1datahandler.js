@@ -34,7 +34,9 @@ F1DataVis.dataHandler.initializeData = function () {
                     }
                 } );
         }
+
     }
+
 
     //var laps = F1DataVis.data.lapTimes, i = 0, tempIndex, length = laps.length, raceId, raceIds = [], tempRaceIds, year, years = [], raceByYear = {};
     //for ( i = 0; i < length; i++ ) {
@@ -121,25 +123,26 @@ F1DataVis.dataHandler.createCnstrctrStndgsByRaceIds = function ( year ) {
         }
 
     }
+    F1DataVis.dataHandler.createDetailedPositions( year );
 
 };
 
-F1DataVis.dataHandler.createDetailedPositions = function () {
-    var year, racesByYear = F1DataVis.data.racesByYear, races, i, length, raceId, constructorStandings, object, j, length2;
-    for ( year in racesByYear ) {
-        races = racesByYear[year];
-        length = races.length;
-        object = F1DataVis.data.positionsByTeamByRound[year] = {};
-        for ( i = 0; i < length; i++ ) {
-            raceId = races[i].raceId;
-            object[races[i].round] = {};
-            constructorStandings = F1DataVis.data.constructorStandingsByRaceId[raceId];
-            length2 = constructorStandings.length;
-            for ( j = 0; j < length2; j++ ) {
-                object[races[i].round][constructorStandings[j].constructorId] = constructorStandings[j].position;
-            }
+F1DataVis.dataHandler.createDetailedPositions = function ( year ) {
+    var racesByYear = F1DataVis.data.racesByYear, races, i, length, raceId, constructorStandings, object, j, length2;
+
+    races = racesByYear[year];
+    length = races.length;
+    object = F1DataVis.data.positionsByTeamByRound[year] = {};
+    for ( i = 0; i < length; i++ ) {
+        raceId = races[i].raceId;
+        object[races[i].round] = {};
+        constructorStandings = F1DataVis.data.constructorStandingsByRaceId[raceId];
+        length2 = constructorStandings.length;
+        for ( j = 0; j < length2; j++ ) {
+            object[races[i].round][constructorStandings[j].constructorId] = constructorStandings[j].position;
         }
     }
+
 };
 
 F1DataVis.dataHandler.getTeamsInSeason = function ( year ) {

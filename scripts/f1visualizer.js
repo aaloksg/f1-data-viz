@@ -35,7 +35,7 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
     this.sliderMoved = function ( year ) {
         console.log( 'slider value changed to - ' + year );
         var raceIds = F1DataVis.dataHandler.getRaceIdsInYear( year );
-        console.log('RaceIds - ' + raceIds);
+        console.log( 'RaceIds - ' + raceIds );
         F1DataVis.dataHandler.createCnstrctrStndgsByRaceIds( year );
         self.parallelCoords.draw( year );
     };
