@@ -21,7 +21,7 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
     this.draw = function () {
         this.slider.draw();
         this.parallelCoords.initialize( this.width, this.slider.yPosition );
-        this.sliderMoved( this.slider.getValue() )
+        this.sliderMoved( this.slider.getValue() );
     };
 
     this.update = function ( width, height ) {
@@ -37,6 +37,10 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
         var raceIds = F1DataVis.dataHandler.getRaceIdsInYear( year );
         console.log( 'RaceIds - ' + raceIds );
         F1DataVis.dataHandler.createCnstrctrStndgsByRaceIds( year );
-        self.parallelCoords.draw( year );
+        self.parallelCoords.drawSeason( year );
     };
+
+    this.onSliderHandleClicked = function () {
+        self.parallelCoords.sliderHandleClicked( self.slider.getValue());
+    }
 }

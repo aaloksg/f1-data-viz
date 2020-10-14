@@ -1,34 +1,85 @@
 var F1DataVis = F1DataVis || {};
 F1DataVis.IdStore = F1DataVis.IdStore || {};
 F1DataVis.IdStore.paracoordHolder = 'paracoordHolderGrp'
+F1DataVis.IdStore.paracoordParentGrp = 'paracoordParentGrp';
+F1DataVis.IdStore.paracoordClipper = 'paracoordClipper';
 
 F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     var self = this,
         _svgParent = svgParent,
+        _paracoordParentGrp,
         _paracoordHolder,
         _visualizer = visualizer,
-        _marginProps = { left: 150, top: 20, right: 100, bottom: 20 },
+        _marginProps = { left: 120, top: 20, right: 100, bottom: 45 },
+        _clippingProps = { left: 10, top: 5, right: 10, bottom: 0 },
         _scales = new Map(),
         _getXPosition,
+        _lapScales = new Map(),
+        _getXPositionOfLap,
         _displayedYear,
-        _transitionSpeed = 2000;
+        _displayingYear = true,
+        _displayedRaceId,
+        _transitionSpeed = 2000,
+        _clipRect,
+        _initializeClipping = function () {
+            _clipRect = d3.select( _paracoordParentGrp )
+                .append( 'clipPath' )
+                .attr( 'id', F1DataVis.IdStore.paracoordClipper )
+                .append( 'rect' );
+            _clipRect
+                .attr( 'x', _clippingProps.left )
+                .attr( 'y', _clippingProps.top )
+                .attr( 'height', self.height - _clippingProps.top - _clippingProps.bottom )
+                .attr( 'width', self.width - _clippingProps.left - _clippingProps.right );
+            d3.select( _paracoordHolder )
+                .attr( 'clip-path', 'url(#' + F1DataVis.IdStore.paracoordClipper + ')' );
+        };
 
     this.width = 0;
     this.height = 0;
     this.left = 0;
     this.top = 0;
     this.seasonalGrp = {};
+    this.raceGrp = {};
 
     this.initialize = function ( width, height ) {
         this.width = width;
         this.height = height;
+        _paracoordParentGrp = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
+        _paracoordParentGrp.setAttributeNS( null, 'id', F1DataVis.IdStore.paracoordParentGrp );
+        _svgParent.appendChild( _paracoordParentGrp );
         _paracoordHolder = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
         _paracoordHolder.setAttributeNS( null, 'id', F1DataVis.IdStore.paracoordHolder );
-        _svgParent.appendChild( _paracoordHolder );
+        _paracoordParentGrp.appendChild( _paracoordHolder );
+        _initializeClipping();
     };
 
-    this.draw = function ( year ) {
+    this.drawSeason = function ( year ) {
         var races, numberOfRaces, teams, numberOfTeams, negator = 0, orderedTeams, verticalAxisRange, verticalAxisDomain;
+
+        if ( _displayingYear === false ) {
+            // Translate out the race.
+            this.raceGrp[_displayedRaceId]
+                .attr( 'transform', 'translate(0,0)' )
+                .transition()
+                .duration( _transitionSpeed / 2 )
+                .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' );
+
+            _displayingYear = true;
+
+            // Translate in the season.
+            this.seasonalGrp[_displayedYear]
+                .attr( 'transform', 'translate(0,' + ( this.height * 1.5 ) + ')' )
+                .transition()
+                .duration( _transitionSpeed / 2 )
+                .attr( 'transform', 'translate(0,0)' )
+                .on( 'end', function () {
+                    this.drawSeason( year );
+                }.bind( this ) );
+            return;
+        }
+
+        _displayingYear = true;
 
         if ( _displayedYear ) {
             // translate this out
@@ -79,7 +130,6 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             _scales.set(
                 0,
                 d3.scaleOrdinal()
-
                     .range( verticalAxisRange )
                     .domain( orderedTeams.map( team => team.name ) )
             );
@@ -95,15 +145,15 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 );
             } );
 
-            this.drawAxes( year, races, negator );
+            this.drawSeasonAxes( year, races, negator );
             this.drawPaths( races, orderedTeams );
         }
     };
 
-    this.drawAxes = function ( year, races, negator ) {
+    this.drawSeasonAxes = function ( year, races, negator ) {
         this.seasonalGrp[year] = d3.select( _paracoordHolder )
             .append( "g" )
-            .attr( 'id', 'group_' + year );
+            .attr( 'id', 'group_year_' + year );
 
         // Translate in the year from the correct side.
         this.seasonalGrp[year]
@@ -119,17 +169,26 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             .join( "g" )
             .attr( 'id', race => 'Year_' + year + '_Round_' + race.round )
             .attr( "transform", race => `translate(${_getXPosition( race.round )},0)` )
+            .on( 'click', this.onRaceClicked )
             .each( function ( race, index ) {
                 // Drawing lines for axes.
                 if ( index === 0 ) {
                     d3.select( this ).call( d3.axisLeft( _scales.get( race.round ) ) );
-                } else if ( index === races.length ) {
-                    d3.select( this ).call( d3.axisRight( _scales.get( race.round ) ) );
                 } else {
+                    if ( index === races.length ) {
+                        d3.select( this ).call( d3.axisRight( _scales.get( race.round ) ) );
+                    } else {
+                        d3.select( this )
+                            .append( "path" )
+                            .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]] ) )
+                            .attr( "stroke", "#005AD4" );
+                    }
                     d3.select( this )
                         .append( "path" )
                         .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]] ) )
-                        .attr( "stroke", "#005AD4" );
+                        .attr( "stroke-width", 20 )
+                        .attr( "stroke", 'black' )
+                        .attr( "stroke-opacity", 0 );
                 }
 
                 var raceNameFormatted = race.name.split( ' ' );
@@ -152,14 +211,134 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         //
     };
 
+    this.drawRace = function ( race ) {
+        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length;
+
+        _displayingYear = false;
+        _displayedRaceId = race.raceId;
+        // Create the group for the displayed year.
+        laps = F1DataVis.dataHandler.getLapsByRaceId( race.raceId );
+        length = laps.length;
+        for ( var i = 0; i < length; i++ ) {
+            lap = laps[i];
+            driverId = lap.driverId;
+            if ( drivers[driverId] === undefined ) {
+                drivers[driverId] = [];
+                numberOfDrivers++;
+            }
+            drivers[driverId].push( lap );
+            if ( lap.lap > numberOfLaps ) {
+                numberOfLaps = lap.lap;
+            }
+        }
+        for ( driverId in drivers ) {
+            driverObjects.push( F1DataVis.dataHandler.getDriversByID( parseInt( driverId, 10 ) ) );
+            drivers[driverId].sort( ( lapA, lapB ) => {
+                if ( lapA.lap < lapB.lap ) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            } )
+        }
+
+        // TODO: Sort driverObjects somehow.
+        lapRange = d3.range( 0, numberOfLaps + 1 );
+        _getXPositionOfLap = d3.scalePoint( lapRange, [_marginProps.left, this.width - _marginProps.right] );
+
+        verticalAxisRange = d3.range( _marginProps.top, self.height - _marginProps.bottom + 1, ( self.height - _marginProps.bottom - _marginProps.top ) / ( numberOfDrivers - 1 ) );
+        verticalAxisDomain = d3.range( 1, numberOfDrivers + 1 );
+
+
+        lapRange.forEach( function ( lapNumber ) {
+            if ( lapNumber === 0 ) {
+                _lapScales.set(
+                    lapNumber,
+                    d3.scaleOrdinal()
+                        .range( verticalAxisRange )
+                        .domain( driverObjects.map( driver => driver.surname + ', ' + driver.forename ) )
+                );
+            } else {
+                _lapScales.set(
+                    lapNumber,
+                    d3.scaleOrdinal()
+                        .range( verticalAxisRange )
+                        .domain( verticalAxisDomain )
+                );
+            }
+        } );
+        this.drawRaceAxes( numberOfLaps );
+    };
+
+    this.drawRaceAxes = function ( numberOfLaps ) {
+        var data = [{ text: ' Drivers', lap: 0 }].concat( d3.range( 1, numberOfLaps + 1 ).map( ( val ) => {
+            return { lap: val, text: val.toString() };
+        } ) );
+        this.raceGrp[_displayedRaceId] = d3.select( _paracoordHolder )
+            .append( "g" )
+            .attr( 'id', 'group_race_' + _displayedRaceId );
+
+        // Translate in the race.
+        this.raceGrp[_displayedRaceId]
+            .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' )
+            .transition()
+            .duration( _transitionSpeed )
+            .attr( 'transform', 'translate(0,0)' );
+
+        this.raceGrp[_displayedRaceId]
+            .selectAll( "g" )
+            .data( data )
+            .join( "g" )
+            .attr( 'id', text => 'Race' + _displayedRaceId + '_Lap_' + text.lap )
+            .attr( "transform", text => `translate(${_getXPositionOfLap( text.lap )},0)` )
+            .each( function ( text, index ) {
+                // Drawing lines for axes.
+                if ( index === 0 ) {
+                    d3.select( this ).call( d3.axisLeft( _lapScales.get( text.lap ) ) );
+                } else {
+                    if ( index === numberOfLaps ) {
+                        d3.select( this ).call( d3.axisRight( _lapScales.get( text.lap ) ) );
+                    } else {
+                        d3.select( this )
+                            .append( "path" )
+                            .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]] ) )
+                            .attr( "stroke", "black" );
+                    }
+                    d3.select( this )
+                        .append( "path" )
+                        .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]] ) )
+                        .attr( "stroke-width", 20 )
+                        .attr( "stroke", 'black' )
+                        .attr( "stroke-opacity", 0 );
+                }
+                var raceNameFormatted = text.text.split( ' ' ), i,
+                    textGroup = d3.select( this )
+                        .append( "g" )
+                        .attr( 'id', race => 'Race' + _displayedRaceId + '_Lap_' + text.lap + '_TextGroup' );
+                for ( i = 0; i < raceNameFormatted.length; i++ ) {
+                    textGroup.append( "text" )
+                        .attr( "x", 0 )
+                        .attr( "y", self.height - _marginProps.bottom + ( i * 10 ) + 15 )
+                        .attr( 'font-family', 'bahnschrift' )
+                        .attr( 'font-weight', 'bold' )
+                        .attr( "fill", "#005AD4" )
+                        .attr( 'font-size', 10 )
+                        .attr( "text-anchor", "middle" )
+                        .text( raceNameFormatted[i] )
+                }
+            } );
+    };
 
     this.getYCoordinate = function ( round, position ) {
         return _scales.get( round )( position );
     };
 
-    this.drawPaths = function ( races, teams ) {
+    this.getYCoordinateOfDriver = function ( lap, position ) {
+        return _lapScales.get( lap )( position );
+    };
 
-        const polylines = this.seasonalGrp[_displayedYear]
+    this.drawPaths = function ( races, teams ) {
+        var polylines = this.seasonalGrp[_displayedYear]
             .append( "g" )
             .attr( 'id', race => 'Year_' + _displayedYear + '_polylineGroup' )
             .selectAll( "path" )
@@ -169,7 +348,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             .attr( "stroke-width", 2 )
             .attr( "stroke", "Black" )
             .attr( "fill", "none" )
-            //reate the polylines
+            // create the polylines
             .attr( "d", team => d3.line()( d3.range( 0, races.length + 1 ).map( round => {
                 var x = _getXPosition( round ), y, position;
                 if ( round === 0 ) {
@@ -185,14 +364,45 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 }
                 return [x, y];
             } ) )
-
-            )
-    }
+            );
+    };
 
     this.update = function ( width, height ) {
         if ( this.width !== width || this.height !== height ) {
             this.width = width;
             this.height = height;
+        }
+    };
+
+    this.onRaceClicked = function ( event ) {
+        var round = parseInt( event.currentTarget.id.split( 'Round_' )[1].split( '_' )[0], 10 ),
+            race = F1DataVis.dataHandler.getRaceByRoundInYear( _displayedYear, round );
+
+        // Translate out the season.
+        self.seasonalGrp[_displayedYear]
+            .transition()
+            .duration( _transitionSpeed )
+            .attr( 'transform', 'translate(0,' + ( self.height * 1.5 ) + ')' );
+        self.drawRace( race );
+    };
+
+    this.sliderHandleClicked = function ( year ) {
+        if ( _displayingYear === false && year === _displayedYear ) {
+            // Translate out the race.
+            this.raceGrp[_displayedRaceId]
+                .attr( 'transform', 'translate(0,0)' )
+                .transition()
+                .duration( _transitionSpeed )
+                .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' );
+
+            _displayingYear = true;
+
+            // Translate in the season.
+            this.seasonalGrp[_displayedYear]
+                .attr( 'transform', 'translate(0,' + ( this.height * 1.5 ) + ')' )
+                .transition()
+                .duration( _transitionSpeed )
+                .attr( 'transform', 'translate(0,0)' );
         }
     };
 }
