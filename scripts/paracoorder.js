@@ -40,6 +40,20 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .attr( 'width', self.width - _clippingProps.left - _clippingProps.right );
             d3.select( _paracoordHolder )
                 .attr( 'clip-path', 'url(#' + F1DataVis.IdStore.paracoordClipper + ')' );
+        },
+        _translateSeasonOut = function ( negator ) {
+            self.seasonalGrp[_displayedYear]
+                .attr( 'transform', 'translate(0,0)' )
+                .transition()
+                .duration( _transitionSpeed )
+                .attr( 'transform', 'translate(' + ( self.width * 1.5 * negator ) + ',0)' );
+        },
+        _translateSeasonIn = function ( negator) {
+            self.seasonalGrp[_displayedYear]
+                .attr( 'transform', 'translate(' + ( self.width * 1.5 * -negator ) + ',0)' ) // Translate in the year from the correct side.
+                .transition()
+                .duration( _transitionSpeed )
+                .attr( 'transform', 'translate(0,0)' );
         };
 
     this.width = 0;
@@ -95,21 +109,14 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             } else {
                 negator = 1;
             }
-            this.seasonalGrp[_displayedYear]
-                .transition()
-                .duration( _transitionSpeed )
-                .attr( 'transform', 'translate(' + ( this.width * 1.5 * negator ) + ',0)' );
+            _translateSeasonOut( negator );
         }
 
         _displayedYear = year; // set year to be displayed
 
         if ( this.seasonalGrp[_displayedYear] ) {
             // translate this in if group already exists.
-            this.seasonalGrp[_displayedYear]
-                .attr( 'transform', 'translate(' + ( this.width * 1.5 * -negator ) + ',0)' ) // Translate in the year from the correct side.
-                .transition()
-                .duration( _transitionSpeed )
-                .attr( 'transform', 'translate(0,0)' );
+            _translateSeasonIn( negator );
         } else {
             // Create the group for the displayed year.
             races = F1DataVis.data.racesByYear[_displayedYear];
@@ -164,11 +171,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     this.drawSeasonAxes = function ( races, negator ) {
 
         // Translate in the year from the correct side.
-        this.seasonalGrp[_displayedYear]
-            .attr( 'transform', 'translate(' + ( this.width * 1.5 * -negator ) + ',0)' )
-            .transition()
-            .duration( _transitionSpeed )
-            .attr( 'transform', 'translate(0,0)' );
+        _translateSeasonIn( negator );
 
 
         this.seasonalGrp[_displayedYear]
