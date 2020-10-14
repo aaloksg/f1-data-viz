@@ -12,8 +12,8 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _visualizer = visualizer,
         _marginProps = { left: 120, top: 20, right: 100, bottom: 50 },
         _clippingProps = { left: 10, top: 5, right: 10, bottom: 0 },
-        _scales = new Map(),
-        _getXPosition,
+        _raceScales = new Map(),
+        _getXPositionOfRace,
         _lapScales = new Map(),
         _getXPositionOfLap,
         _displayedYear,
@@ -96,18 +96,18 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
 
         _displayedYear = year; // set year to be displayed
 
-        if ( this.seasonalGrp[year] ) {
+        if ( this.seasonalGrp[_displayedYear] ) {
             // translate this in if group already exists.
-            this.seasonalGrp[year]
+            this.seasonalGrp[_displayedYear]
                 .attr( 'transform', 'translate(' + ( this.width * 1.5 * -negator ) + ',0)' ) // Translate in the year from the correct side.
                 .transition()
                 .duration( _transitionSpeed )
                 .attr( 'transform', 'translate(0,0)' );
         } else {
             // Create the group for the displayed year.
-            races = F1DataVis.data.racesByYear[year];
+            races = F1DataVis.data.racesByYear[_displayedYear];
             numberOfRaces = races.length;
-            teams = F1DataVis.dataHandler.getTeamsInSeason( year );
+            teams = F1DataVis.dataHandler.getTeamsInSeason( _displayedYear );
             numberOfTeams = teams.length;
 
             // Sort teams alphabetically.
@@ -122,12 +122,12 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     }
                 } );
 
-            _getXPosition = d3.scalePoint( d3.range( 0, numberOfRaces + 1 ), [_marginProps.left, this.width - _marginProps.right] );
+            _getXPositionOfRace = d3.scalePoint( d3.range( 0, numberOfRaces + 1 ), [_marginProps.left, this.width - _marginProps.right] );
 
             verticalAxisRange = d3.range( _marginProps.top, self.height - _marginProps.bottom + 1, ( self.height - _marginProps.bottom - _marginProps.top ) / ( numberOfTeams - 1 ) );
             verticalAxisDomain = d3.range( 1, numberOfTeams + 1 );
 
-            _scales.set(
+            _raceScales.set(
                 0,
                 d3.scaleOrdinal()
                     .range( verticalAxisRange )
@@ -135,7 +135,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             );
 
             races.forEach( function ( race ) {
-                _scales.set(
+                _raceScales.set(
                     race.round,
                     d3.scaleOrdinal()
                         .range( verticalAxisRange )
@@ -145,38 +145,39 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 );
             } );
 
-            this.drawSeasonAxes( year, races, negator );
+            this.seasonalGrp[_displayedYear] = d3.select( _paracoordHolder )
+                .append( "g" )
+                .attr( 'id', 'group_year_' + _displayedYear );
+
+            this.drawSeasonAxes( races, negator );
             this.drawPaths( races, orderedTeams );
         }
     };
 
-    this.drawSeasonAxes = function ( year, races, negator ) {
-        this.seasonalGrp[year] = d3.select( _paracoordHolder )
-            .append( "g" )
-            .attr( 'id', 'group_year_' + year );
+    this.drawSeasonAxes = function ( races, negator ) {
 
         // Translate in the year from the correct side.
-        this.seasonalGrp[year]
+        this.seasonalGrp[_displayedYear]
             .attr( 'transform', 'translate(' + ( this.width * 1.5 * -negator ) + ',0)' )
             .transition()
             .duration( _transitionSpeed )
             .attr( 'transform', 'translate(0,0)' );
 
 
-        this.seasonalGrp[year]
+        this.seasonalGrp[_displayedYear]
             .selectAll( "g" )
             .data( [{ round: 0, name: '  Teams' }].concat( races ) )
             .join( "g" )
-            .attr( 'id', race => 'Year_' + year + '_Round_' + race.round )
-            .attr( "transform", race => `translate(${_getXPosition( race.round )},0)` )
+            .attr( 'id', race => 'Year_' + _displayedYear + '_Round_' + race.round )
+            .attr( "transform", race => `translate(${_getXPositionOfRace( race.round )},0)` )
             .on( 'click', this.onRaceClicked )
             .each( function ( race, index ) {
                 // Drawing lines for axes.
                 if ( index === 0 ) {
-                    d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisLeft( _scales.get( race.round ) ) );
+                    d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisLeft( _raceScales.get( race.round ) ) );
                 } else {
                     if ( index === races.length ) {
-                        d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisRight( _scales.get( race.round ) ) );
+                        d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisRight( _raceScales.get( race.round ) ) );
                     } else {
                         d3.select( this )
                             .append( "path" )
@@ -194,7 +195,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 var raceNameFormatted = race.name.split( ' ' );
                 var textGroup = d3.select( this )
                     .append( "g" )
-                    .attr( 'id', race => 'Year_' + year + '_Round_' + race.round + '_TextGroup' )
+                    .attr( 'id', race => 'Year_' + _displayedYear + '_Round_' + race.round + '_TextGroup' )
                     .attr( "class", "axisXLabels" );
                 for ( i = 0; i < raceNameFormatted.length; i++ ) {
                     textGroup.append( "text" )
@@ -253,7 +254,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     lapNumber,
                     d3.scaleOrdinal()
                         .range( verticalAxisRange )
-                        .domain( driverObjects.map( driver => driver.forename + ' .' + driver.surname[0]) )
+                        .domain( driverObjects.map( driver => driver.forename + ' .' + driver.surname[0] ) )
                 );
             } else {
                 _lapScales.set(
@@ -312,7 +313,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     textGroup = d3.select( this )
                         .append( "g" )
                         .attr( 'id', race => 'Race' + _displayedRaceId + '_Lap_' + text.lap + '_TextGroup' )
-                        .attr( "class", "axisXLabels");
+                        .attr( "class", "axisXLabels" );
                 for ( i = 0; i < raceNameFormatted.length; i++ ) {
                     textGroup.append( "text" )
                         .attr( "x", 0 )
@@ -324,7 +325,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.getYCoordinate = function ( round, position ) {
-        return _scales.get( round )( position );
+        return _raceScales.get( round )( position );
     };
 
     this.getYCoordinateOfDriver = function ( lap, position ) {
@@ -332,7 +333,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.drawPaths = function ( races, teams ) {
-        var getColour = d3.scaleOrdinal( d3.schemeCategory10.concat( d3.schemeCategory10 ) ).domain( teams.map( team => team.constructorId )), polylines = this.seasonalGrp[_displayedYear]
+        var getColour = d3.scaleOrdinal( d3.schemeCategory10.concat( d3.schemeCategory10 ) ).domain( teams.map( team => team.constructorId ) ), polylines = this.seasonalGrp[_displayedYear]
             .append( "g" )
             .attr( 'id', race => 'Year_' + _displayedYear + '_polylineGroup' )
             .selectAll( "path" )
@@ -344,7 +345,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             .attr( "fill", "none" )
             // create the polylines
             .attr( "d", team => d3.line()( d3.range( 0, races.length + 1 ).map( round => {
-                var x = _getXPosition( round ), y, position;
+                var x = _getXPositionOfRace( round ), y, position;
                 if ( round === 0 ) {
                     y = self.getYCoordinate( 0, team.name );
                 }
