@@ -7,25 +7,37 @@ F1DataVis.data.teamsById = {};
 F1DataVis.data.constructorStandingsByRaceId = {};
 
 F1DataVis.dataHandler.initializeData = function () {
-    var length, i, item;
+    var length, i, item, races;
     F1DataVis.data.racesByYear = {};
     if ( F1DataVis.data.races ) {
         length = F1DataVis.data.races.length;
         for ( i = 0; i < length; i++ ) {
-            item = F1DataVis.data.races[i];
-            if ( F1DataVis.data.racesByYear[item.year] ) {
-                F1DataVis.data.racesByYear[item.year].push( item );
+            item = F1DataVis.data.races[ i ];
+            if ( F1DataVis.data.racesByYear[ item.year ] ) {
+                F1DataVis.data.racesByYear[ item.year ].push( item );
             } else {
-                F1DataVis.data.racesByYear[item.year] = [item];
+                F1DataVis.data.racesByYear[ item.year ] = [ item ];
             }
+        }
+        for ( item in F1DataVis.data.racesByYear ) {
+            F1DataVis.data.racesByYear[ item ]
+                .sort( ( raceA, raceB ) => {
+                    if ( raceA.round < raceB.round ) {
+                        return -1;
+                    } else if ( raceA.round > raceB.round ) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                } );
         }
     }
 };
 
 F1DataVis.dataHandler.getRaceIdsInYear = function ( year ) {
-    var races = F1DataVis.data.racesByYear[year], raceIds = [], length = races.length, i;
+    var races = F1DataVis.data.racesByYear[ year ], raceIds = [], length = races.length, i;
     for ( i = 0; i < length; i++ ) {
-        raceIds.push( races[i].raceId );
+        raceIds.push( races[ i ].raceId );
     }
     return raceIds;
 };
@@ -36,15 +48,15 @@ F1DataVis.dataHandler.createCnstrctrStndgsByRaceIds = function ( year ) {
     length = F1DataVis.data.constructorStandings.length;
     if ( F1DataVis.data.constructorStandings ) {
         for ( i = 0; i < length; i = i + jump ) {
-            item = F1DataVis.data.constructorStandings[i];
+            item = F1DataVis.data.constructorStandings[ i ];
             raceId = item.raceId;
             if ( raceIds.indexOf( raceId ) > -1 ) {
                 raceIds.splice( raceIds.indexOf( raceId ), 1 );
-                if ( F1DataVis.data.constructorStandingsByRaceId[raceId] === undefined ) {
+                if ( F1DataVis.data.constructorStandingsByRaceId[ raceId ] === undefined ) {
                     if ( i !== 0 ) {
                         lowerBound = i - jump;
                         for ( j = i - 1; j > lowerBound; j-- ) {
-                            item = F1DataVis.data.constructorStandings[j];
+                            item = F1DataVis.data.constructorStandings[ j ];
                             if ( item.raceId !== raceId ) {
                                 break;
                             }
@@ -57,13 +69,13 @@ F1DataVis.dataHandler.createCnstrctrStndgsByRaceIds = function ( year ) {
                     }
 
                     for ( j = i + 1; j < length; j++ ) {
-                        item = F1DataVis.data.constructorStandings[j];
+                        item = F1DataVis.data.constructorStandings[ j ];
                         if ( item.raceId !== raceId ) {
                             break;
                         }
                     }
                     upperBound = j;
-                    F1DataVis.data.constructorStandingsByRaceId[raceId] = F1DataVis.data.constructorStandings.slice( lowerBound, upperBound );
+                    F1DataVis.data.constructorStandingsByRaceId[ raceId ] = F1DataVis.data.constructorStandings.slice( lowerBound, upperBound );
                     i = upperBound - jump;
                 }
                 if ( raceIds.length === 0 ) {
@@ -80,41 +92,41 @@ F1DataVis.dataHandler.createCnstrctrStndgsByRaceIds = function ( year ) {
 };
 
 F1DataVis.dataHandler.getTeamsInSeason = function ( year ) {
-    var teams = [], races = F1DataVis.data.racesByYear[year],
+    var teams = [], races = F1DataVis.data.racesByYear[ year ],
         racesLength = races.length, raceIndex,
         noOfStandings, standingIndex,
         constructorStandings, constructorId;
-    if ( F1DataVis.data.teamIdsByYear[year] ) {
-        teams = F1DataVis.data.teamIdsByYear[year];
+    if ( F1DataVis.data.teamIdsByYear[ year ] ) {
+        teams = F1DataVis.data.teamIdsByYear[ year ];
     } else {
         for ( raceIndex = 0; raceIndex < racesLength; raceIndex++ ) {
-            constructorStandings = F1DataVis.data.constructorStandingsByRaceId[races[raceIndex].raceId];
+            constructorStandings = F1DataVis.data.constructorStandingsByRaceId[ races[ raceIndex ].raceId ];
             noOfStandings = constructorStandings.length;
             for ( standingIndex = 0; standingIndex < noOfStandings; standingIndex++ ) {
-                constructorId = constructorStandings[standingIndex].constructorId;
+                constructorId = constructorStandings[ standingIndex ].constructorId;
                 if ( teams.indexOf( constructorId ) === -1 ) {
                     teams.push( constructorId );
                 }
             }
         }
-        F1DataVis.data.teamIdsByYear[year] = teams;
+        F1DataVis.data.teamIdsByYear[ year ] = teams;
     }
     return teams;
 };
 
 F1DataVis.dataHandler.getTeamsByID = function ( teamId ) {
     var team, index, length, teams;
-    if ( F1DataVis.data.teamsById[teamId] ) {
-        team = F1DataVis.data.teamsById[teamId];
+    if ( F1DataVis.data.teamsById[ teamId ] ) {
+        team = F1DataVis.data.teamsById[ teamId ];
     } else {
         teams = F1DataVis.data.constructors;
         length = teams.length;
         for ( index = 0; index < length; index++ ) {
-            if ( teams[index].constructorId === teamId ) {
-                team = teams[index];
+            if ( teams[ index ].constructorId === teamId ) {
+                team = teams[ index ];
             }
         }
-        F1DataVis.data.teamsById[teamId] = team;
+        F1DataVis.data.teamsById[ teamId ] = team;
     }
     return team;
 };
