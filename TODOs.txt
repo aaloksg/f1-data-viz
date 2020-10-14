@@ -43,9 +43,9 @@ Data to use-
 
 - Write functions for translating in/out races and seasons. - Aalok
 
-- Change lines of lap colour to blue.
+- Change lines of lap colour to blue. - Done.
 
-- Change opacity of lap and race lines.
+- Change opacity of lap and race lines. - Done.
 
 - Check colour schemes.
 
@@ -58,3 +58,7 @@ Data to use-
 - Set display to none/hidden after animating out, and to visible/true before animating in. - Both
 
 - Style linecaps. - Both.
+
+- Change cursor style when hovering on selectable items. - Done
+
+- Make texts unselectable if needed.

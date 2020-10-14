@@ -3,6 +3,8 @@ F1DataVis.IdStore = F1DataVis.IdStore || {};
 F1DataVis.IdStore.paracoordHolder = 'paracoordHolderGrp'
 F1DataVis.IdStore.paracoordParentGrp = 'paracoordParentGrp';
 F1DataVis.IdStore.paracoordClipper = 'paracoordClipper';
+F1DataVis.IdStore.highlightedElementClass = 'highlighted';
+F1DataVis.IdStore.highlightableElementClass = 'highlightableElement';
 
 F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     var self = this,
@@ -20,6 +22,11 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _displayingYear = true,
         _displayedRaceId,
         _transitionSpeed = 2000,
+        _midAxisColor = "#005AD4",
+        _midAxisWidth = 2,
+        _midAxisOpacity = 0.25,
+        _midAxisShadowWidth = 20,
+        _midAxisShadowOpacity = 0,
         _clipRect,
         _initializeClipping = function () {
             _clipRect = d3.select( _paracoordParentGrp )
@@ -170,7 +177,14 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             .join( "g" )
             .attr( 'id', race => 'Year_' + _displayedYear + '_Round_' + race.round )
             .attr( "transform", race => `translate(${_getXPositionOfRace( race.round )},0)` )
+            .attr( 'cursor', race => race.round === 0 ? 'auto' : 'pointer' )
             .on( 'click', this.onRaceClicked )
+            .on( 'mouseover', function () {
+                this.classList.add( F1DataVis.IdStore.highlightedElementClass );
+            } )
+            .on( 'mouseout', function () {
+                this.classList.remove( F1DataVis.IdStore.highlightedElementClass );
+            } )
             .each( function ( race, index ) {
                 // Drawing lines for axes.
                 if ( index === 0 ) {
@@ -182,14 +196,17 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         d3.select( this )
                             .append( "path" )
                             .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]] ) )
-                            .attr( "stroke", "#005AD4" );
+                            .attr( "stroke-width", _midAxisWidth )
+                            .attr( "stroke", _midAxisColor )
+                            .attr( "stroke-opacity", _midAxisOpacity );
                     }
                     d3.select( this )
                         .append( "path" )
                         .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]] ) )
-                        .attr( "stroke-width", 20 )
-                        .attr( "stroke", 'black' )
-                        .attr( "stroke-opacity", 0 );
+                        .attr( 'class', F1DataVis.IdStore.highlightableElementClass )
+                        .attr( "stroke-width", _midAxisShadowWidth )
+                        .attr( "stroke", _midAxisColor )
+                        .attr( "stroke-opacity", _midAxisShadowOpacity );
                 }
 
                 var raceNameFormatted = race.name.split( ' ' );
@@ -300,14 +317,16 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         d3.select( this )
                             .append( "path" )
                             .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]] ) )
-                            .attr( "stroke", "black" );
+                            .attr( "stroke", _midAxisColor )
+                            .attr( "stroke-width", _midAxisWidth )
+                            .attr( "stroke-opacity", _midAxisOpacity );
                     }
                     d3.select( this )
                         .append( "path" )
                         .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]] ) )
-                        .attr( "stroke-width", 20 )
-                        .attr( "stroke", 'black' )
-                        .attr( "stroke-opacity", 0 );
+                        .attr( "stroke-width", _midAxisShadowWidth )
+                        .attr( "stroke", _midAxisColor )
+                        .attr( "stroke-opacity", _midAxisShadowOpacity );
                 }
                 var raceNameFormatted = text.text.split( ' ' ), i,
                     textGroup = d3.select( this )
@@ -371,8 +390,11 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
 
     this.onRaceClicked = function ( event ) {
         var round = parseInt( event.currentTarget.id.split( 'Round_' )[1].split( '_' )[0], 10 ),
-            race = F1DataVis.dataHandler.getRaceByRoundInYear( _displayedYear, round );
-
+            race;
+        if ( round === 0 ) {
+            return;
+        }
+        race = F1DataVis.dataHandler.getRaceByRoundInYear( _displayedYear, round );
         // Translate out the season.
         self.seasonalGrp[_displayedYear]
             .transition()

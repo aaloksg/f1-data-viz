@@ -5,7 +5,7 @@ svg {
     background-color: #89CEFF;
 }
 
-.axisLabels path {
+.axisLabels path:not(.highlightableElement) {
     stroke: #E70000;
     stroke-width: 2;
 }
@@ -25,4 +25,8 @@ svg {
     stroke-width: 0.5px;
     font-size: 10px;
     font-style: normal;
+}
+
+.highlighted .highlightableElement {
+    stroke-opacity: 0.25;
 }
