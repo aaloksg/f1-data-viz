@@ -4,3 +4,25 @@ svg {
     overflow-y: hidden;
     background-color: #89CEFF;
 }
+
+.axisLabels path {
+    stroke: #E70000;
+    stroke-width: 2;
+}
+
+.axisLabels text {
+    font-family: Bahnschrift;
+    font-style: italic;
+    font-weight: bold;
+    fill: #005AD4;
+    stroke-width: 0.5px;
+    font-size: 15px;
+}
+.axisXLabels text {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #005AD4;
+    stroke-width: 0.5px;
+    font-size: 10px;
+    font-style: normal;
+}

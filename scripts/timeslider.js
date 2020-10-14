@@ -79,7 +79,7 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
             .step( 1 )
             .width( _visualizer.width - _marginProps.left - _marginProps.right )
             .tickFormat( d3.format( '' ) )
-            .tickValues( d3.range( 1996, 2018, 5 ))//.concat( [2017] ) )
+            .tickValues( d3.range( 1996, 2018, 2 ))//.concat( [2017] ) )
             .default( 2017 )
             .on( 'onchange', _visualizer.sliderMoved);
 

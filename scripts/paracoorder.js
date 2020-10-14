@@ -10,7 +10,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _paracoordParentGrp,
         _paracoordHolder,
         _visualizer = visualizer,
-        _marginProps = { left: 120, top: 20, right: 100, bottom: 45 },
+        _marginProps = { left: 120, top: 20, right: 100, bottom: 50 },
         _clippingProps = { left: 10, top: 5, right: 10, bottom: 0 },
         _scales = new Map(),
         _getXPosition,
@@ -173,10 +173,10 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             .each( function ( race, index ) {
                 // Drawing lines for axes.
                 if ( index === 0 ) {
-                    d3.select( this ).call( d3.axisLeft( _scales.get( race.round ) ) );
+                    d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisLeft( _scales.get( race.round ) ) );
                 } else {
                     if ( index === races.length ) {
-                        d3.select( this ).call( d3.axisRight( _scales.get( race.round ) ) );
+                        d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisRight( _scales.get( race.round ) ) );
                     } else {
                         d3.select( this )
                             .append( "path" )
@@ -195,16 +195,13 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 var textGroup = d3.select( this )
                     .append( "g" )
                     .attr( 'id', race => 'Year_' + year + '_Round_' + race.round + '_TextGroup' )
+                    .attr( "class", "axisXLabels" );
                 for ( i = 0; i < raceNameFormatted.length; i++ ) {
                     textGroup.append( "text" )
                         .attr( "x", 0 )
-                        .attr( "y", self.height - _marginProps.bottom + ( i * 10 ) + 15 )
-                        .attr( 'font-family', 'bahnschrift' )
-                        .attr( 'font-weight', 'bold' )
-                        .attr( "fill", "#005AD4" )
-                        .attr( 'font-size', 10 )
+                        .attr( "y", self.height - _marginProps.bottom + ( i * 10 ) + 20 )
                         .attr( "text-anchor", "middle" )
-                        .text( raceNameFormatted[i] )
+                        .text( raceNameFormatted[i] );
                 }
             } );
 
@@ -256,7 +253,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     lapNumber,
                     d3.scaleOrdinal()
                         .range( verticalAxisRange )
-                        .domain( driverObjects.map( driver => driver.surname + ', ' + driver.forename ) )
+                        .domain( driverObjects.map( driver => driver.forename + ' .' + driver.surname[0]) )
                 );
             } else {
                 _lapScales.set(
@@ -294,10 +291,10 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             .each( function ( text, index ) {
                 // Drawing lines for axes.
                 if ( index === 0 ) {
-                    d3.select( this ).call( d3.axisLeft( _lapScales.get( text.lap ) ) );
+                    d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisLeft( _lapScales.get( text.lap ) ) );
                 } else {
                     if ( index === numberOfLaps ) {
-                        d3.select( this ).call( d3.axisRight( _lapScales.get( text.lap ) ) );
+                        d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisRight( _lapScales.get( text.lap ) ) );
                     } else {
                         d3.select( this )
                             .append( "path" )
@@ -314,17 +311,14 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 var raceNameFormatted = text.text.split( ' ' ), i,
                     textGroup = d3.select( this )
                         .append( "g" )
-                        .attr( 'id', race => 'Race' + _displayedRaceId + '_Lap_' + text.lap + '_TextGroup' );
+                        .attr( 'id', race => 'Race' + _displayedRaceId + '_Lap_' + text.lap + '_TextGroup' )
+                        .attr( "class", "axisXLabels");
                 for ( i = 0; i < raceNameFormatted.length; i++ ) {
                     textGroup.append( "text" )
                         .attr( "x", 0 )
                         .attr( "y", self.height - _marginProps.bottom + ( i * 10 ) + 15 )
-                        .attr( 'font-family', 'bahnschrift' )
-                        .attr( 'font-weight', 'bold' )
-                        .attr( "fill", "#005AD4" )
-                        .attr( 'font-size', 10 )
                         .attr( "text-anchor", "middle" )
-                        .text( raceNameFormatted[i] )
+                        .text( raceNameFormatted[i] );
                 }
             } );
     };
@@ -338,15 +332,15 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.drawPaths = function ( races, teams ) {
-        var polylines = this.seasonalGrp[_displayedYear]
+        var getColour = d3.scaleOrdinal( d3.schemeCategory10.concat( d3.schemeCategory10 ) ).domain( teams.map( team => team.constructorId )), polylines = this.seasonalGrp[_displayedYear]
             .append( "g" )
             .attr( 'id', race => 'Year_' + _displayedYear + '_polylineGroup' )
             .selectAll( "path" )
             .data( teams )
             .join( "path" )
             .attr( 'id', team => 'Year_' + _displayedYear + '_polylineGroup_Team_' + team.constructorId )
-            .attr( "stroke-width", 2 )
-            .attr( "stroke", "Black" )
+            .attr( "stroke-width", 5 )
+            .attr( "stroke", team => getColour( team.constructorId ) )
             .attr( "fill", "none" )
             // create the polylines
             .attr( "d", team => d3.line()( d3.range( 0, races.length + 1 ).map( round => {
