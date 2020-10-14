@@ -33,13 +33,28 @@ Data to use-
 
 - Get standings information of a race ->  F1DataVis.data.constructorStandingsByRaceId[raceId] ---- Get position of team by iterating and matching constructorId
 
-- Position texts - ankith
-- Polyline drawing
+- Position texts - ankith - Done.
+- Polyline drawing for season - Done.
 - Stylize lines
 - Stylize fonts
-- 
 
-- Change _scales to _raceScales and _getXPosition to _getXPositionOfRace
-- Change year to _displayedYear after _displayedYear is set.
+- Change _scales to _raceScales and _getXPosition to _getXPositionOfRace - done.
+- Change year to _displayedYear after _displayedYear is set. - done.
 
-- Write functions for translating in/out races and seasons.
+- Write functions for translating in/out races and seasons. - Aalok
+
+- Change lines of lap colour to blue.
+
+- Change opacity of lap and race lines.
+
+- Check colour schemes.
+
+- Implement viridis - for colourblind.
+
+- Polyline drawing for race - Ankith
+
+- Animation of polylines. - Both
+
+- Set display to none/hidden after animating out, and to visible/true before animating in. - Both
+
+- Style linecaps. - Both.
