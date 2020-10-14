@@ -38,3 +38,8 @@ Data to use-
 - Stylize lines
 - Stylize fonts
 - 
+
+- Change _scales to _raceScales and _getXPosition to _getXPositionOfRace
+- Change year to _displayedYear after _displayedYear is set.
+
+- Write functions for translating in/out races and seasons.
