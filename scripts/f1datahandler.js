@@ -8,6 +8,7 @@ F1DataVis.data.driversById = {};
 F1DataVis.data.constructorStandingsByRaceId = {};
 F1DataVis.data.laptimesByRaceId = {};
 F1DataVis.data.positionsByTeamByRound = {};
+F1DataVis.data.polePositionsByRaceId = {};
 
 F1DataVis.dataHandler.initializeData = function () {
     var length, i, item, races;
@@ -36,6 +37,33 @@ F1DataVis.dataHandler.initializeData = function () {
         }
 
     }
+
+    F1DataVis.data.polePositionsByRaceId = {};
+    if ( F1DataVis.data.qualifying ) {
+        length = F1DataVis.data.qualifying.length;
+        for ( i = 0; i < length; i++ ) {
+            item = F1DataVis.data.qualifying[i];
+            if ( F1DataVis.data.polePositionsByRaceId[item.raceId] ) {
+                F1DataVis.data.polePositionsByRaceId[item.raceId].push( item );
+            } else {
+                F1DataVis.data.polePositionsByRaceId[item.raceId] = [item];
+            }
+        }
+        for ( item in F1DataVis.data.polePositionsByRaceId ) {
+            F1DataVis.data.polePositionsByRaceId[item]
+                .sort( ( posA, posB ) => {
+                    if ( posA.position < posB.position ) {
+                        return -1;
+                    } else if ( posA.position > posB.position ) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                } );
+        }
+
+    }
+
 
 
     //var laps = F1DataVis.data.lapTimes, i = 0, tempIndex, length = laps.length, raceId, raceIds = [], tempRaceIds, year, years = [], raceByYear = {};
@@ -224,3 +252,11 @@ F1DataVis.dataHandler.getLapsByRaceId = function ( raceId ) {
     }
     return laps;
 };
+
+F1DataVis.dataHandler.getDriverObjByPolePositions = function ( raceId ) {
+    if ( F1DataVis.data.polePositionsByRaceId[raceId] === undefined ) {
+        return undefined;
+    }
+    return F1DataVis.data.polePositionsByRaceId[raceId].map( item => F1DataVis.dataHandler.getDriversByID( item.driverId ) );
+    
+}

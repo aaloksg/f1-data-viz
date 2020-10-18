@@ -26,7 +26,26 @@ svg {
     font-size: 10px;
     font-style: normal;
 }
+.raceNameText {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #005AD4;
+    font-size: 30px;
+    font-style: normal;
+}
 
 .highlighted .highlightableElement {
     stroke-opacity: 0.25;
+}
+
+.highlightedPath {
+    stroke-opacity: 1;
+}
+
+.deHilightedGroup {
+    stroke-opacity: 0.25;
+}
+
+.deHilightedGroup .highlightablePath {
+    stroke-opacity: 1;
 }

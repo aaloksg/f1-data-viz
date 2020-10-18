@@ -5,6 +5,8 @@ F1DataVis.IdStore.paracoordParentGrp = 'paracoordParentGrp';
 F1DataVis.IdStore.paracoordClipper = 'paracoordClipper';
 F1DataVis.IdStore.highlightedElementClass = 'highlighted';
 F1DataVis.IdStore.highlightableElementClass = 'highlightableElement';
+F1DataVis.IdStore.dehighlightedGroupClass = 'deHilightedGroup';
+F1DataVis.IdStore.highlightablePathClass = 'highlightablePath';
 
 F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     var self = this,
@@ -12,12 +14,8 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _paracoordParentGrp,
         _paracoordHolder,
         _visualizer = visualizer,
-        _marginProps = { left: 120, top: 20, right: 100, bottom: 50 },
-        _clippingProps = { left: 10, top: 5, right: 10, bottom: 0 },
-        _raceScales = new Map(),
-        _getXPositionOfRace,
-        _lapScales = new Map(),
-        _getXPositionOfLap,
+        _marginProps = {left: 120, top: 20, right: 100, bottom: 50},
+        _clippingProps = {left: 10, top: 5, right: 10, bottom: 0},
         _displayedYear,
         _displayingYear = true,
         _displayedRaceId,
@@ -27,6 +25,8 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _midAxisOpacity = 0.25,
         _midAxisShadowWidth = 20,
         _midAxisShadowOpacity = 0,
+        _pathWidth = 5,
+        _pathShadowWidth = _midAxisShadowWidth,
         _clipRect,
         _initializeClipping = function () {
             _clipRect = d3.select( _paracoordParentGrp )
@@ -48,12 +48,27 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .duration( _transitionSpeed )
                 .attr( 'transform', 'translate(' + ( self.width * 1.5 * negator ) + ',0)' );
         },
-        _translateSeasonIn = function ( negator) {
+        _translateSeasonIn = function ( negator ) {
             self.seasonalGrp[_displayedYear]
                 .attr( 'transform', 'translate(' + ( self.width * 1.5 * -negator ) + ',0)' ) // Translate in the year from the correct side.
                 .transition()
                 .duration( _transitionSpeed )
-                .attr( 'transform', 'translate(0,0)' );
+                .attr( 'transform', 'translate(0,0)' )
+                .on( 'end', _animateSeasonPaths );
+        },
+        _getDriverName = function ( driver ) {
+            return driver.forename + ' .' + driver.surname[0];
+        },
+        _animateSeasonPaths = function () {
+            if ( self.drawnSeasonPaths[_displayedYear] === undefined ) {
+                // Do animation
+                self.drawSeasonPaths();
+                self.drawnSeasonPaths[_displayedYear] = true;
+            }
+        },
+        _animateRacePaths = function () {
+            // Do animation
+            self.drawRacePaths();
         };
 
     this.width = 0;
@@ -61,7 +76,12 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     this.left = 0;
     this.top = 0;
     this.seasonalGrp = {};
+    this.seasonalParams = {};
+
     this.raceGrp = {};
+    this.racialParams = {};
+
+    this.drawnSeasonPaths = {};
 
     this.initialize = function ( width, height ) {
         this.width = width;
@@ -76,7 +96,9 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.drawSeason = function ( year ) {
-        var races, numberOfRaces, teams, numberOfTeams, negator = 0, orderedTeams, verticalAxisRange, verticalAxisDomain;
+        var races, numberOfRaces, teams, numberOfTeams, negator = 0, orderedTeams, verticalAxisRange, verticalAxisDomain,
+            raceScales = new Map(),
+            getXPositionOfRace;
 
         if ( _displayingYear === false ) {
             // Translate out the race.
@@ -136,12 +158,12 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     }
                 } );
 
-            _getXPositionOfRace = d3.scalePoint( d3.range( 0, numberOfRaces + 1 ), [_marginProps.left, this.width - _marginProps.right] );
+            getXPositionOfRace = d3.scalePoint( d3.range( 0, numberOfRaces + 1 ), [_marginProps.left, this.width - _marginProps.right] );
 
             verticalAxisRange = d3.range( _marginProps.top, self.height - _marginProps.bottom + 1, ( self.height - _marginProps.bottom - _marginProps.top ) / ( numberOfTeams - 1 ) );
             verticalAxisDomain = d3.range( 1, numberOfTeams + 1 );
 
-            _raceScales.set(
+            raceScales.set(
                 0,
                 d3.scaleOrdinal()
                     .range( verticalAxisRange )
@@ -149,7 +171,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             );
 
             races.forEach( function ( race ) {
-                _raceScales.set(
+                raceScales.set(
                     race.round,
                     d3.scaleOrdinal()
                         .range( verticalAxisRange )
@@ -163,27 +185,32 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .append( "g" )
                 .attr( 'id', 'group_year_' + _displayedYear );
 
+            this.seasonalParams[_displayedYear] = {races: races, orderedTeams: orderedTeams, raceScales: raceScales, getXPositionOfRace: getXPositionOfRace};
+
             this.drawSeasonAxes( races, negator );
-            this.drawPaths( races, orderedTeams );
+            // this.drawSeasonPaths( races, orderedTeams );
         }
     };
 
     this.drawSeasonAxes = function ( races, negator ) {
-
+        var getXPositionOfRace = this.seasonalParams[_displayedYear].getXPositionOfRace,
+            raceScales = this.seasonalParams[_displayedYear].raceScales;
         // Translate in the year from the correct side.
         _translateSeasonIn( negator );
 
 
         this.seasonalGrp[_displayedYear]
             .selectAll( "g" )
-            .data( [{ round: 0, name: '  Teams' }].concat( races ) )
+            .data( [{round: 0, name: '  Teams'}].concat( races ) )
             .join( "g" )
             .attr( 'id', race => 'Year_' + _displayedYear + '_Round_' + race.round )
-            .attr( "transform", race => `translate(${_getXPositionOfRace( race.round )},0)` )
+            .attr( "transform", race => `translate(${getXPositionOfRace( race.round )},0)` )
             .attr( 'cursor', race => race.round === 0 ? 'auto' : 'pointer' )
             .on( 'click', this.onRaceClicked )
             .on( 'mouseover', function () {
-                this.classList.add( F1DataVis.IdStore.highlightedElementClass );
+                if ( _displayingYear === true ) {
+                    this.classList.add( F1DataVis.IdStore.highlightedElementClass );
+                }
             } )
             .on( 'mouseout', function () {
                 this.classList.remove( F1DataVis.IdStore.highlightedElementClass );
@@ -191,10 +218,10 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             .each( function ( race, index ) {
                 // Drawing lines for axes.
                 if ( index === 0 ) {
-                    d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisLeft( _raceScales.get( race.round ) ) );
+                    d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisLeft( raceScales.get( race.round ) ) );
                 } else {
                     if ( index === races.length ) {
-                        d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisRight( _raceScales.get( race.round ) ) );
+                        d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisRight( raceScales.get( race.round ) ) );
                     } else {
                         d3.select( this )
                             .append( "path" )
@@ -230,8 +257,9 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.drawRace = function ( race ) {
-        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length;
-
+        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length,
+            lapScales = new Map(),
+            getXPositionOfLap;
         _displayingYear = false;
         _displayedRaceId = race.raceId;
         // Create the group for the displayed year.
@@ -250,7 +278,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             }
         }
         for ( driverId in drivers ) {
-            driverObjects.push( F1DataVis.dataHandler.getDriversByID( parseInt( driverId, 10 ) ) );
+            //driverObjects.push( F1DataVis.dataHandler.getDriversByID( parseInt( driverId, 10 ) ) );
             drivers[driverId].sort( ( lapA, lapB ) => {
                 if ( lapA.lap < lapB.lap ) {
                     return -1;
@@ -259,10 +287,20 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 }
             } )
         }
+        driverObjects = F1DataVis.dataHandler.getDriverObjByPolePositions( _displayedRaceId ); //TODO if driverObjs = undefined 
+        length = driverObjects.length;
+        for ( i = 0; i < length; i++ ) {
+            if ( drivers[driverObjects[i].driverId] === undefined ) {
+                driverObjects.splice( i, 1 );
+                i--;
+                length--;
+            }
+        }
+
 
         // TODO: Sort driverObjects somehow.
         lapRange = d3.range( 0, numberOfLaps + 1 );
-        _getXPositionOfLap = d3.scalePoint( lapRange, [_marginProps.left, this.width - _marginProps.right] );
+        getXPositionOfLap = d3.scalePoint( lapRange, [_marginProps.left, this.width - _marginProps.right] );
 
         verticalAxisRange = d3.range( _marginProps.top, self.height - _marginProps.bottom + 1, ( self.height - _marginProps.bottom - _marginProps.top ) / ( numberOfDrivers - 1 ) );
         verticalAxisDomain = d3.range( 1, numberOfDrivers + 1 );
@@ -270,14 +308,14 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
 
         lapRange.forEach( function ( lapNumber ) {
             if ( lapNumber === 0 ) {
-                _lapScales.set(
+                lapScales.set(
                     lapNumber,
                     d3.scaleOrdinal()
                         .range( verticalAxisRange )
-                        .domain( driverObjects.map( driver => driver.forename + ' .' + driver.surname[0] ) )
+                        .domain( driverObjects.map( driver => _getDriverName( driver ) ) )
                 );
             } else {
-                _lapScales.set(
+                lapScales.set(
                     lapNumber,
                     d3.scaleOrdinal()
                         .range( verticalAxisRange )
@@ -285,12 +323,26 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 );
             }
         } );
-        this.drawRaceAxes( numberOfLaps );
+        this.racialParams[_displayedRaceId] = {drivers: drivers, driverObjects: driverObjects, numberOfLaps: numberOfLaps, lapScales: lapScales, getXPositionOfLap: getXPositionOfLap};
+
+        this.drawRaceAxes();
+        //this.drawRacePaths( drivers, driverObjects, numberOfLaps );
+        this.raceGrp[_displayedRaceId].append( "g" )
+            .attr( "id", 'raceNameGrp' )
+            .append( "text" )
+            .attr( "x", self.width / 2 )
+            .attr( "y", self.height )
+            .attr('class', 'raceNameText')
+            .attr( "text-anchor", "middle" )
+            .text( race.name );
     };
 
-    this.drawRaceAxes = function ( numberOfLaps ) {
-        var data = [{ text: ' Drivers', lap: 0 }].concat( d3.range( 1, numberOfLaps + 1 ).map( ( val ) => {
-            return { lap: val, text: val.toString() };
+    this.drawRaceAxes = function () {
+        var lapScales = this.racialParams[_displayedRaceId].lapScales,
+            numberOfLaps = this.racialParams[_displayedRaceId].numberOfLaps,
+            getXPositionOfLap = this.racialParams[_displayedRaceId].getXPositionOfLap,
+            data = [{text: ' Drivers', lap: 0}].concat( d3.range( 1, numberOfLaps + 1 ).map( ( val ) => {
+            return {lap: val, text: val.toString()};
         } ) );
         this.raceGrp[_displayedRaceId] = d3.select( _paracoordHolder )
             .append( "g" )
@@ -301,21 +353,22 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' )
             .transition()
             .duration( _transitionSpeed )
-            .attr( 'transform', 'translate(0,0)' );
+            .attr( 'transform', 'translate(0,0)' )
+            .on( 'end', _animateRacePaths );
 
         this.raceGrp[_displayedRaceId]
             .selectAll( "g" )
             .data( data )
             .join( "g" )
             .attr( 'id', text => 'Race' + _displayedRaceId + '_Lap_' + text.lap )
-            .attr( "transform", text => `translate(${_getXPositionOfLap( text.lap )},0)` )
+            .attr( "transform", text => `translate(${getXPositionOfLap( text.lap )},0)` )
             .each( function ( text, index ) {
                 // Drawing lines for axes.
                 if ( index === 0 ) {
-                    d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisLeft( _lapScales.get( text.lap ) ) );
+                    d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisLeft( lapScales.get( text.lap ) ) );
                 } else {
                     if ( index === numberOfLaps ) {
-                        d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisRight( _lapScales.get( text.lap ) ) );
+                        d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisRight( lapScales.get( text.lap ) ) );
                     } else {
                         d3.select( this )
                             .append( "path" )
@@ -347,41 +400,142 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.getYCoordinate = function ( round, position ) {
-        return _raceScales.get( round )( position );
+        return this.seasonalParams[_displayedYear].raceScales.get( round )( position );
     };
 
     this.getYCoordinateOfDriver = function ( lap, position ) {
-        return _lapScales.get( lap )( position );
+        return this.racialParams[_displayedRaceId].lapScales.get( lap )( position );
     };
 
-    this.drawPaths = function ( races, teams ) {
-        var getColour = d3.scaleOrdinal( d3.schemeCategory10.concat( d3.schemeCategory10 ) ).domain( teams.map( team => team.constructorId ) ), polylines = this.seasonalGrp[_displayedYear]
+    this.drawSeasonPaths = function () {    
+        var races = this.seasonalParams[_displayedYear].races,
+            teams = this.seasonalParams[_displayedYear].orderedTeams,
+getXPositionOfRace = this.seasonalParams[_displayedYear].getXPositionOfRace,
+            getColour = d3.scaleOrdinal( d3.schemeCategory10.concat( d3.schemeCategory10 ) ).domain( teams.map( team => team.constructorId ) ), polylines = this.seasonalGrp[_displayedYear]
             .append( "g" )
             .attr( 'id', race => 'Year_' + _displayedYear + '_polylineGroup' )
             .selectAll( "path" )
             .data( teams )
-            .join( "path" )
+            .join( "g" )
             .attr( 'id', team => 'Year_' + _displayedYear + '_polylineGroup_Team_' + team.constructorId )
-            .attr( "stroke-width", 5 )
-            .attr( "stroke", team => getColour( team.constructorId ) )
-            .attr( "fill", "none" )
-            // create the polylines
-            .attr( "d", team => d3.line()( d3.range( 0, races.length + 1 ).map( round => {
-                var x = _getXPositionOfRace( round ), y, position;
-                if ( round === 0 ) {
-                    y = self.getYCoordinate( 0, team.name );
-                }
-                else {
-                    position = F1DataVis.data.positionsByTeamByRound[_displayedYear][round][team.constructorId];
-                    if ( position === undefined ) {
-                        position = teams.length;
+            .on( 'mouseover', function () {
+                this.parentElement.classList.add( F1DataVis.IdStore.dehighlightedGroupClass );
+                this.classList.add( F1DataVis.IdStore.highlightablePathClass );
+            } )
+            .on( 'mouseout', function () {
+                this.parentElement.classList.remove( F1DataVis.IdStore.dehighlightedGroupClass );
+                this.classList.remove( F1DataVis.IdStore.highlightablePathClass );
+            } )
+            .each( function ( team ) {
+                var points = d3.range( 0, races.length + 1 ).map( round => {
+                    var x = getXPositionOfRace( round ), y, position;
+                    if ( round === 0 ) {
+                        y = self.getYCoordinate( 0, team.name );
                     }
-                    y = self.getYCoordinate( round, position );
+                    else {
+                        position = F1DataVis.data.positionsByTeamByRound[_displayedYear][round][team.constructorId];
+                        if ( position === undefined ) {
+                            position = teams.length;
+                        }
+                        y = self.getYCoordinate( round, position );
 
-                }
-                return [x, y];
-            } ) )
-            );
+                    }
+                    return [x, y];
+                } ),
+                path = d3.select( this )
+                    .append( 'path' )
+                    .attr( 'id', team => 'Year_' + _displayedYear + '_polylineGroup_Team_' + team.constructorId + '_path' )
+                    .attr( "stroke-width", _pathWidth )
+                    .attr( "stroke", team => getColour( team.constructorId ) )
+                    .attr( "fill", "none" )
+                    // create the polylines
+                        .attr( "d", team => d3.line()( points ) ),
+                    pathLength = path.node().getTotalLength();
+                d3.select( this )
+                    .append( 'path' )
+                    .attr( 'id', team => 'Year_' + _displayedYear + '_polylineGroup_Team_' + team.constructorId + '_path_shadow' )
+                    .attr( "stroke-width", _pathShadowWidth )
+                    .attr( "stroke", team => getColour( team.constructorId ) )
+                    .attr( "stroke-opacity", 0 )
+                    .attr( "fill", "none" )
+                    // create the polylines
+                    .attr( "d", team => d3.line()( points ) );
+                path
+                    .attr( 'stroke-dasharray', pathLength )
+                    .attr( 'stroke-dashoffset', pathLength )
+                    .transition()
+                    .duration( _transitionSpeed )
+                    .attr( 'stroke-dashoffset', 0 );
+            } );
+    };
+
+    this.drawRacePaths = function () {
+        var drivers = this.racialParams[_displayedRaceId].drivers,
+            driverObjects = this.racialParams[_displayedRaceId].driverObjects,
+            numberOfLaps = this.racialParams[_displayedRaceId].numberOfLaps,
+            getXPositionOfLap = this.racialParams[_displayedRaceId].getXPositionOfLap,
+            getColour = d3.scaleOrdinal( d3.schemeCategory10.concat( d3.schemeCategory10 ) ).domain( driverObjects.map( driver => driver.driverId ) ),
+            polylines = this.raceGrp[_displayedRaceId]
+                .append( "g" )
+                .attr( 'id', 'group_race_' + _displayedRaceId )
+                .selectAll( "path" )
+                .data( driverObjects )
+                .join( "g" )
+                .attr( 'id', driver => 'Year_' + _displayedYear + '_race_' + _displayedRaceId + '_driver_' + driver.driverId + '_group' )
+                .on( 'mouseover', function () {
+                    this.parentElement.classList.add( F1DataVis.IdStore.dehighlightedGroupClass );
+                    this.classList.add( F1DataVis.IdStore.highlightablePathClass );
+                } )
+                .on( 'mouseout', function () {
+                    this.parentElement.classList.remove( F1DataVis.IdStore.dehighlightedGroupClass );
+                    this.classList.remove( F1DataVis.IdStore.highlightablePathClass );
+                } )
+                .each( function ( driver ) {
+                    var points = d3.range( 0, numberOfLaps + 1 ).map( lap => {
+                        var x = getXPositionOfLap( lap ), y, position;
+
+                        if ( lap === 0 ) {
+                            y = self.getYCoordinateOfDriver( 0, _getDriverName( driver ) );
+                        }
+                        else {
+                            if ( drivers[driver.driverId][lap - 1] === undefined ) {
+                                if ( drivers[driver.driverId][lap - 2] === undefined || lap === numberOfLaps ) {
+                                    return [];
+                                }
+                                y = self.getYCoordinateOfDriver( lap, driverObjects.length );
+                            }
+                            else {
+                                position = drivers[driver.driverId][lap - 1].position;
+                                y = self.getYCoordinateOfDriver( lap, position );
+                            }
+                        }
+                        return [x, y];
+                    } ), path = d3.select( this )
+                        .append( 'path' )
+                        .attr( 'id', driver => 'Year_' + _displayedYear + '_race_' + _displayedRaceId + '_driver_' + driver.driverId + '_path' )
+                        .attr( "stroke-width", _pathWidth )
+                        .attr( "stroke", driver => getColour( driver.driverId ) )
+                        .attr( "fill", "none" )
+                        // create the polylines
+                            .attr( "d", driver => d3.line()( points ) ),
+                        pathLength = path.node().getTotalLength();
+                    d3.select( this )
+                        .append( 'path' )
+                        .attr( 'id', driver => 'Year_' + _displayedYear + '_race_' + _displayedRaceId + '_driver_' + driver.driverId + '_path_shadow' )
+                        .attr( "stroke-width", _pathShadowWidth )
+                        .attr( "stroke", driver => getColour( driver.driverId ) )
+                        .attr( "stroke-opacity", 0 )
+                        .attr( "fill", "none" )
+                        // create the polylines
+                        .attr( "d", driver => d3.line()( points ) );
+
+                    path
+                        .attr( 'stroke-dasharray', pathLength )
+                        .attr( 'stroke-dashoffset', pathLength )
+                        .transition()
+                        .duration( _transitionSpeed )
+                        .attr( 'stroke-dashoffset', 0 );
+                } );
     };
 
     this.update = function ( width, height ) {

@@ -1,10 +1,48 @@
-Font family of slider texts
-
-Font colour scheme of slider texts.
-
 Reference slider - https://github.com/johnwalley/d3-simple-slider
 
+- Stylize lines
+	- Style linecaps. - Both.
+
+- Stylize fonts
+
+- Check colour schemes.
+
+- Implement viridis - for colourblind.
+
+- Set display to none/hidden after animating out, and to visible/true before animating in. - Both
+
+- Add error page
+
+- Add race name
+
+- Add logo
+
+- Add RaceGrp to objects 
+
+- Initial delay 
+
+- BrasilGP 2014 check 
+
+- Animation of polylines. - Done
+- Change _scales to _raceScales and _getXPosition to _getXPositionOfRace - done.
+- Change year to _displayedYear after _displayedYear is set. - done.
+- Write functions for translating in/out races and seasons. - Aalok - Done
+- Change lines of lap colour to blue. - Done.
+- Change opacity of lap and race lines. - Done.
+- Polyline drawing for race - Ankith = Done
+- Change cursor style when hovering on selectable items. - Done
+- Position texts - ankith - Done.
+- Polyline drawing for season - Done.
+- Font family of slider texts - Done
+- Font colour scheme of slider texts. - Done
+
+- Make texts unselectable if needed. - NO.
+
+Bugs:
+- Some laptimes don't exist - we will add error page.
 Issue with last label overlap with pointer label-- cause by opacity!!
+
+References: 
 
 Data to use-
 
@@ -32,33 +70,3 @@ Data to use-
 - Get team details -> F1DataVis.dataHandler.getTeamsByID(teamId) ---- Text for axes
 
 - Get standings information of a race ->  F1DataVis.data.constructorStandingsByRaceId[raceId] ---- Get position of team by iterating and matching constructorId
-
-- Position texts - ankith - Done.
-- Polyline drawing for season - Done.
-- Stylize lines
-- Stylize fonts
-
-- Change _scales to _raceScales and _getXPosition to _getXPositionOfRace - done.
-- Change year to _displayedYear after _displayedYear is set. - done.
-
-- Write functions for translating in/out races and seasons. - Aalok
-
-- Change lines of lap colour to blue. - Done.
-
-- Change opacity of lap and race lines. - Done.
-
-- Check colour schemes.
-
-- Implement viridis - for colourblind.
-
-- Polyline drawing for race - Ankith
-
-- Animation of polylines. - Both
-
-- Set display to none/hidden after animating out, and to visible/true before animating in. - Both
-
-- Style linecaps. - Both.
-
-- Change cursor style when hovering on selectable items. - Done
-
-- Make texts unselectable if needed.
