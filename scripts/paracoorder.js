@@ -52,7 +52,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             self.seasonalGrp[_displayedYear]
                 .attr( 'transform', 'translate(' + ( self.width * 1.5 * -negator ) + ',0)' ) // Translate in the year from the correct side.
                 .transition()
-                .duration( _transitionSpeed )
+                .duration( negator === 0 ? 0 : _transitionSpeed ) // Negator is 0 during the first load.
                 .attr( 'transform', 'translate(0,0)' )
                 .on( 'end', _animateSeasonPaths );
         },
@@ -69,6 +69,18 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _animateRacePaths = function () {
             // Do animation
             self.drawRacePaths();
+        },
+        _resetRacePaths = function () {
+            if ( self.racialParams[_displayedRaceId] && self.racialParams[_displayedRaceId].paths ) {
+                var length = self.racialParams[_displayedRaceId].paths.length, i, path, pathLength;
+                for ( i = 0; i < length; i++ ) {
+                    path = self.racialParams[_displayedRaceId].paths[i];
+                    pathLength = path.node().getTotalLength();
+                    path
+                        .attr( 'stroke-dasharray', pathLength )
+                        .attr( 'stroke-dashoffset', pathLength );
+                }
+            }
         };
 
     this.width = 0;
@@ -269,8 +281,9 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' )
                 .transition()
                 .duration( _transitionSpeed )
-                .attr( 'transform', 'translate(0,0)' )
-                .on( 'end', _animateRacePaths );
+                .attr( 'transform', 'translate(0,0)' );
+            // Reset the race paths.
+            //_resetRacePaths();
         } else {
             // Create the group for the displayed year.
 
@@ -317,8 +330,6 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     }
                 }
 
-
-                // TODO: Sort driverObjects somehow.
                 lapRange = d3.range( 0, numberOfLaps + 1 );
                 getXPositionOfLap = d3.scalePoint( lapRange, [_marginProps.left, this.width - _marginProps.right] );
 
@@ -495,7 +506,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             getXPositionOfLap,
             getColour,
             path, length, i, pathLength;
-        if ( this.racialParams[_displayedRaceId].paths.length === 0 ) {
+        if ( self.racialParams[_displayedRaceId] && this.racialParams[_displayedRaceId].paths.length === 0 ) {
             drivers = this.racialParams[_displayedRaceId].drivers;
             driverObjects = this.racialParams[_displayedRaceId].driverObjects;
             numberOfLaps = this.racialParams[_displayedRaceId].numberOfLaps;
