@@ -13,6 +13,12 @@ Reference slider - https://github.com/johnwalley/d3-simple-slider
 
 - Add error page
 
+- Add highlights to names and end positions.
+
+- Add highlight to text below selectable races.
+
+- Add 'Laps' and 'Races' indices.
+
 - Add race name
 
 - Add logo
