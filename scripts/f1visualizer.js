@@ -1,8 +1,77 @@
 var F1DataVis = F1DataVis || {};
 F1DataVis.IdStore = F1DataVis.IdStore || {};
+F1DataVis.IdStore.ButtonNormal = 'ButtonNormal_Gradient';
+F1DataVis.IdStore.ButtonPressed = 'ButtonPressed_Gradient';
+F1DataVis.IdStore.ButtonHover = 'ButtonHover_Gradient';
+F1DataVis.IdStore.ButtonNormalURL = 'url(#' + F1DataVis.IdStore.ButtonNormal + ')';
+F1DataVis.IdStore.ButtonPressedURL = 'url(#' + F1DataVis.IdStore.ButtonPressed + ')';
+F1DataVis.IdStore.ButtonHoverURL = 'url(#' + F1DataVis.IdStore.ButtonHover + ')';
 
 F1DataVis.f1Visualizer = function ( parentSvg ) {
-    var self = this;
+    var self = this,
+        _createStyles = function () {
+            var defs = document.getElementById( F1DataVis.IdStore.defs ), linearGrad, stopElement;
+            // Normal gradient
+            linearGrad = document.createElementNS( 'http://www.w3.org/2000/svg', 'linearGradient' );
+            linearGrad.setAttributeNS( null, 'id', F1DataVis.IdStore.ButtonNormal );
+            linearGrad.setAttributeNS( null, 'x1', '0%' );
+            linearGrad.setAttributeNS( null, 'x2', '0%' );
+            linearGrad.setAttributeNS( null, 'y1', '0%' );
+            linearGrad.setAttributeNS( null, 'y2', '100%' );
+
+            stopElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'stop' );
+            stopElement.setAttributeNS( null, 'offset', '0%' );
+            stopElement.setAttributeNS( null, 'stop-color', '#89CEFF' );
+            linearGrad.appendChild( stopElement );
+
+            stopElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'stop' );
+            stopElement.setAttributeNS( null, 'offset', '100%' );
+            stopElement.setAttributeNS( null, 'stop-color', '#89CEFF' );
+            linearGrad.appendChild( stopElement );
+
+            defs.appendChild( linearGrad );
+
+            // Hovered gradient
+            linearGrad = document.createElementNS( 'http://www.w3.org/2000/svg', 'linearGradient' );
+            linearGrad.setAttributeNS( null, 'id', F1DataVis.IdStore.ButtonHover );
+            linearGrad.setAttributeNS( null, 'x1', '0%' );
+            linearGrad.setAttributeNS( null, 'x2', '0%' );
+            linearGrad.setAttributeNS( null, 'y1', '0%' );
+            linearGrad.setAttributeNS( null, 'y2', '100%' );
+
+            stopElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'stop' );
+            stopElement.setAttributeNS( null, 'offset', '0%' );
+            stopElement.setAttributeNS( null, 'stop-color', '#005AD4' );
+            linearGrad.appendChild( stopElement );
+
+            stopElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'stop' );
+            stopElement.setAttributeNS( null, 'offset', '100%' );
+            stopElement.setAttributeNS( null, 'stop-color', '#89CEFF' );
+            linearGrad.appendChild( stopElement );
+
+            defs.appendChild( linearGrad );
+
+            // Pressed gradient
+            linearGrad = document.createElementNS( 'http://www.w3.org/2000/svg', 'linearGradient' );
+            linearGrad.setAttributeNS( null, 'id', F1DataVis.IdStore.ButtonPressed );
+            linearGrad.setAttributeNS( null, 'x1', '0%' );
+            linearGrad.setAttributeNS( null, 'x2', '0%' );
+            linearGrad.setAttributeNS( null, 'y1', '0%' );
+            linearGrad.setAttributeNS( null, 'y2', '100%' );
+
+            stopElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'stop' );
+            stopElement.setAttributeNS( null, 'offset', '0%' );
+            stopElement.setAttributeNS( null, 'stop-color', '#005AD4' );
+            linearGrad.appendChild( stopElement );
+
+            stopElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'stop' );
+            stopElement.setAttributeNS( null, 'offset', '100%' );
+            stopElement.setAttributeNS( null, 'stop-color', '#005AD4' );
+            linearGrad.appendChild( stopElement );
+
+            defs.appendChild( linearGrad );
+        };
+
     this.width = 0;
     this.height = 0;
 
@@ -16,6 +85,8 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
         this.height = height;
         this.slider = new F1DataVis.timeSlider( this.parentSvg, this );
         this.parallelCoords = new F1DataVis.paraCoorder( this.parentSvg, this );
+
+        _createStyles();
     };
 
     this.draw = function () {

@@ -15,20 +15,17 @@ Reference slider - https://github.com/johnwalley/d3-simple-slider
 
 - Add highlights to names and end positions.
 
-- Add highlight to text below selectable races.
-
-- Add 'Laps' and 'Races' indices.
-
-- Add race name
-
 - Add logo
-
-- Add RaceGrp to objects 
-
-- Initial delay 
 
 - BrasilGP 2014 check 
 
+
+
+- Add RaceGrp to objects - Done
+- Initial delay - done.
+- Add 'Laps' and 'Races' indices.
+- Add race name - done
+- Add highlight to text below selectable races. --Done
 - Animation of polylines. - Done
 - Change _scales to _raceScales and _getXPosition to _getXPositionOfRace - done.
 - Change year to _displayedYear after _displayedYear is set. - done.

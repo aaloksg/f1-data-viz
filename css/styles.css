@@ -26,12 +26,28 @@ svg {
     font-size: 10px;
     font-style: normal;
 }
+.axisXLabels.first text {
+    fill: #E70000;
+    font-size: 12px;
+}
 .raceNameText {
     font-family: Bahnschrift;
     font-weight: bold;
     fill: #005AD4;
     font-size: 30px;
     font-style: normal;
+}
+
+.button rect {
+    fill: url(#ButtonNormal_Gradient);
+}
+
+.button.onHover rect {
+    fill: url(#ButtonHover_Gradient);
+}
+
+.button.onPressed rect {
+    fill: url(#ButtonPressed_Gradient);
 }
 
 .highlighted .highlightableElement {

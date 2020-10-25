@@ -15,10 +15,11 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _paracoordHolder,
         _visualizer = visualizer,
         _marginProps = { left: 120, top: 20, right: 100, bottom: 50 },
-        _clippingProps = { left: 10, top: 5, right: 10, bottom: 0 },
+        _clippingProps = { left: 10, top: 5, right: 10, bottom: -20 },
         _displayedYear,
         _displayingYear = true,
         _displayedRaceId,
+        _displayedRaceIndex = 0,
         _transitionSpeed = 2000,
         _midAxisColor = "#005AD4",
         _midAxisWidth = 2,
@@ -27,7 +28,13 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _midAxisShadowOpacity = 0,
         _pathWidth = 5,
         _pathShadowWidth = _midAxisShadowWidth,
+        _buttonSize = 25,
+        _buttonToTextGap = 10,
         _clipRect,
+        _leftButton,
+        _rightButton,
+        _leftButtonRestPos,
+        _rightButtonRestPos,
         _initializeClipping = function () {
             _clipRect = d3.select( _paracoordParentGrp )
                 .append( 'clipPath' )
@@ -81,6 +88,18 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         .attr( 'stroke-dashoffset', pathLength );
                 }
             }
+        },
+        _onRaceChanged = function ( moveToPrev ) {
+            var negator = 0, race;
+            if ( moveToPrev ) {
+                negator = 1;
+                _displayedRaceIndex--;
+            } else {
+                negator = -1;
+                _displayedRaceIndex++;
+            }
+            race = self.seasonalParams[_displayedYear].races[_displayedRaceIndex];
+            self.drawRace( race, negator )
         };
 
     this.width = 0;
@@ -105,6 +124,11 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _paracoordHolder.setAttributeNS( null, 'id', F1DataVis.IdStore.paracoordHolder );
         _paracoordParentGrp.appendChild( _paracoordHolder );
         _initializeClipping();
+
+        _leftButtonRestPos = -2 * this.width;
+        _leftButton = new F1DataVis.button( _svgParent, _leftButtonRestPos, this.height - _buttonSize * 0.8, _buttonSize, '_LeftRaceButton', true, _onRaceChanged );
+        _rightButtonRestPos = 2 * this.width;
+        _rightButton = new F1DataVis.button( _svgParent, _rightButtonRestPos, this.height - _buttonSize * 0.8, _buttonSize, '_RightRaceButton', false, _onRaceChanged );
     };
 
     this.drawSeason = function ( year ) {
@@ -119,6 +143,8 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .transition()
                 .duration( _transitionSpeed / 2 )
                 .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' );
+            _leftButton.transitionX( _leftButtonRestPos );
+            _rightButton.transitionX( _rightButtonRestPos );
 
             _displayingYear = true;
 
@@ -213,7 +239,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
 
         this.seasonalGrp[_displayedYear]
             .selectAll( "g" )
-            .data( [{ round: 0, name: '  Teams' }].concat( races ) )
+            .data( [{ round: 0, name: '  RACES>>>' }].concat( races ) )
             .join( "g" )
             .attr( 'id', race => 'Year_' + _displayedYear + '_Round_' + race.round )
             .attr( "transform", race => `translate(${getXPositionOfRace( race.round )},0)` )
@@ -256,6 +282,10 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     .append( "g" )
                     .attr( 'id', race => 'Year_' + _displayedYear + '_Round_' + race.round + '_TextGroup' )
                     .attr( "class", "axisXLabels" );
+                if ( index === 0 ) {
+                    textGroup
+                        .attr( "class", "axisXLabels first" );
+                }
                 for ( i = 0; i < raceNameFormatted.length; i++ ) {
                     textGroup.append( "text" )
                         .attr( "x", 0 )
@@ -268,22 +298,40 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         //
     };
 
-    this.drawRace = function ( race ) {
-        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length,
+    this.drawRace = function ( race, negator ) {
+        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length, racialParams,
             lapScales = new Map(),
+            translateFromAttr, translateToAttr,
             getXPositionOfLap;
+        if ( negator === 0 ) {
+            translateFromAttr = 'translate(0,' + ( this.height * -1.5 ) + ')';
+            translateToAttr = 'translate(0,0)';
+        } else {
+            // Translate out the current displayed race.
+            this.raceGrp[_displayedRaceId]
+                .attr( 'transform', 'translate(0,0)' )
+                .transition()
+                .duration( _transitionSpeed )
+                .attr( 'transform', 'translate(' + ( this.width * 1.5 * negator ) + ',0)' );
+            translateFromAttr = 'translate(' + ( this.width * 1.5 * -negator ) + ',0)';
+            translateToAttr = 'translate(0,0)';
+        }
         _displayingYear = false;
         _displayedRaceId = race.raceId;
+
+
+
 
         if ( this.raceGrp[_displayedRaceId] ) {
             // Translate in the race if group already exists.
             this.raceGrp[_displayedRaceId]
-                .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' )
+                .attr( 'transform', translateFromAttr )
                 .transition()
                 .duration( _transitionSpeed )
-                .attr( 'transform', 'translate(0,0)' );
+                .attr( 'transform', translateToAttr );
             // Reset the race paths.
             //_resetRacePaths();
+            racialParams = this.racialParams[_displayedRaceId];
         } else {
             // Create the group for the displayed year.
 
@@ -317,9 +365,16 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             }
             driverObjects = F1DataVis.dataHandler.getDriverObjByPolePositions( _displayedRaceId ); //TODO if driverObjs = undefined 
 
+            this.racialParams[_displayedRaceId] = racialParams = {
+                drivers: [], driverObjects: [], numberOfLaps: 0, lapScales: [], getXPositionOfLap: undefined, paths: [], leftButtonPos: _leftButtonRestPos, rightButtonPos: _rightButtonRestPos
+            };
             if ( driverObjects === undefined ) {
                 // TODO: Create text to display error apology.
-                this.drawRace( race ); // Call this function itself to do the transition :D
+                this.raceGrp[_displayedRaceId]
+                    .attr( 'transform', translateFromAttr )
+                    .transition()
+                    .duration( _transitionSpeed )
+                    .attr( 'transform', translateToAttr );
             } else {
                 length = driverObjects.length;
                 for ( i = 0; i < length; i++ ) {
@@ -354,36 +409,66 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         );
                     }
                 } );
-                this.racialParams[_displayedRaceId] = { drivers: drivers, driverObjects: driverObjects, numberOfLaps: numberOfLaps, lapScales: lapScales, getXPositionOfLap: getXPositionOfLap, paths: [] };
+                racialParams.drivers = drivers;
+                racialParams.driverObjects = driverObjects;
+                racialParams.numberOfLaps = numberOfLaps;
+                racialParams.lapScales = lapScales;
+                racialParams.getXPositionOfLap = getXPositionOfLap;
 
-                this.drawRaceAxes();
+                this.drawRaceAxes( translateFromAttr, translateToAttr );
                 //this.drawRacePaths( drivers, driverObjects, numberOfLaps );
             }
-            this.raceGrp[_displayedRaceId].append( "g" )
+            var raceNametext = this.raceGrp[_displayedRaceId].append( "g" )
                 .attr( "id", 'raceNameGrp' )
                 .append( "text" )
                 .attr( "x", self.width / 2 )
                 .attr( "y", self.height )
                 .attr( 'class', 'raceNameText' )
                 .attr( "text-anchor", "middle" )
-                .text( race.name );
+                .text( race.name ),
+                textBBox = raceNametext._groups[0][0].getBBox();
+            racialParams.leftButtonPos = self.width / 2 - textBBox.width / 2 - _buttonSize - _buttonToTextGap;
+            racialParams.rightButtonPos = self.width / 2 + textBBox.width / 2 + _buttonToTextGap;
+
+            //raceNametext.attr( 'font-size', '30px' )
+            //    .transition()
+            //    .duration( 4000 )
+            //    .attr( 'font-size', '0px' )
+            //    .on( 'end', function () {
+            //        raceNametext
+            //            .text( race.name )
+            //            .attr( 'font-size', '0px' )
+            //            .transition()
+            //            .duration( 1500 )
+            //            .attr( 'font-size', '30px' );
+            //    } );
+        }
+        if ( _displayedRaceIndex === 0 ) {
+            _leftButton.transitionX( _leftButtonRestPos );
+        } else {
+            _leftButton.transitionX( racialParams.leftButtonPos );
+        }
+        if ( _displayedRaceIndex === this.seasonalParams[_displayedYear].races.length - 1 ) {
+            _rightButton.transitionX( _rightButtonRestPos );
+        } else {
+            _rightButton.transitionX( racialParams.rightButtonPos );
         }
     };
 
-    this.drawRaceAxes = function () {
+    this.drawRaceAxes = function ( translateFromAttr, translateToAttr ) {
         var lapScales = this.racialParams[_displayedRaceId].lapScales,
             numberOfLaps = this.racialParams[_displayedRaceId].numberOfLaps,
             getXPositionOfLap = this.racialParams[_displayedRaceId].getXPositionOfLap,
-            data = [{ text: ' Drivers', lap: 0 }].concat( d3.range( 1, numberOfLaps + 1 ).map( ( val ) => {
+            data = [{ text: ' LAPS>>>', lap: 0 }].concat( d3.range( 1, numberOfLaps + 1 ).map( ( val ) => {
                 return { lap: val, text: val.toString() };
             } ) );
 
         // Translate in the race.
         this.raceGrp[_displayedRaceId]
-            .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' )
+            .attr( 'transform', translateFromAttr )
             .transition()
             .duration( _transitionSpeed )
-            .attr( 'transform', 'translate(0,0)' )
+            .attr( 'transform', translateToAttr )
             .on( 'end', _animateRacePaths );
 
         this.raceGrp[_displayedRaceId]
@@ -419,6 +504,10 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         .append( "g" )
                         .attr( 'id', race => 'Race' + _displayedRaceId + '_Lap_' + text.lap + '_TextGroup' )
                         .attr( "class", "axisXLabels" );
+                if ( index === 0 ) {
+                    textGroup
+                        .attr( "class", "axisXLabels first" );
+                }
                 for ( i = 0; i < raceNameFormatted.length; i++ ) {
                     textGroup.append( "text" )
                         .attr( "x", 0 )
@@ -609,7 +698,8 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             .transition()
             .duration( _transitionSpeed )
             .attr( 'transform', 'translate(0,' + ( self.height * 1.5 ) + ')' );
-        self.drawRace( race );
+        _displayedRaceIndex = round - 1;
+        self.drawRace( race, 0 );
     };
 
     this.sliderHandleClicked = function ( year ) {
@@ -620,6 +710,8 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .transition()
                 .duration( _transitionSpeed )
                 .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' );
+            _leftButton.transitionX( _leftButtonRestPos );
+            _rightButton.transitionX( _rightButtonRestPos );
 
             _displayingYear = true;
 

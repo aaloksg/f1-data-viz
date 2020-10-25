@@ -1,6 +1,7 @@
 var F1DataVis = F1DataVis || {};
 F1DataVis.IdStore = F1DataVis.IdStore || {};
 F1DataVis.IdStore.parentSvg = 'ContainerSVG';
+F1DataVis.IdStore.defs = 'F1DataVisDefs';
 
 F1DataVis.handler = F1DataVis.handler || {};
 
@@ -19,6 +20,11 @@ F1DataVis.handler.main = function () {
     parentSvg.setAttributeNS( null, 'width', '100%' );
     parentSvg.setAttributeNS( null, 'height', '100%' );
     parentSvg.setAttributeNS( null, 'id', F1DataVis.IdStore.parentSvg );
+
+    var defs = document.createElementNS( 'http://www.w3.org/2000/svg', 'defs' );
+    defs.setAttributeNS(null, 'id', F1DataVis.IdStore.defs );
+    parentSvg.appendChild( defs );
+
 
     var mainDiv = document.getElementById( 'mainDiv' );
     mainDiv.style.height = window.innerHeight - 20 + 'px';
