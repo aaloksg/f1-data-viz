@@ -369,7 +369,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     }
                 } )
             }
-            driverObjects = F1DataVis.dataHandler.getDriverObjByPolePositions( _displayedRaceId ); //TODO if driverObjs = undefined 
+            driverObjects = F1DataVis.dataHandler.getDriverObjByPolePositions( _displayedRaceId ); 
 
             this.racialParams[_displayedRaceId] = racialParams = {
                 drivers: [], driverObjects: [], numberOfLaps: 0, lapScales: [], getXPositionOfLap: undefined, paths: [], leftButtonPos: _leftButtonRestPos, rightButtonPos: _rightButtonRestPos, dashBoardBound: {}
@@ -381,6 +381,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     .transition()
                     .duration( _transitionSpeed )
                     .attr( 'transform', translateToAttr );
+                        
             } else {
                 length = driverObjects.length;
                 for ( i = 0; i < length; i++ ) {
