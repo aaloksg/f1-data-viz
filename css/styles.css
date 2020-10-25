@@ -54,7 +54,14 @@ svg {
     fill: #dfdfdf;
     font-size: 30px;
     font-style: normal;
-   
+}
+
+.apologyText {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #dfdfdf;
+    font-size: 30px;
+    font-style: normal;
 }
 
 .button rect {

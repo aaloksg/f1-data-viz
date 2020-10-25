@@ -7,6 +7,8 @@ F1DataVis.IdStore.highlightedElementClass = 'highlighted';
 F1DataVis.IdStore.highlightableElementClass = 'highlightableElement';
 F1DataVis.IdStore.dehighlightedGroupClass = 'deHilightedGroup';
 F1DataVis.IdStore.highlightablePathClass = 'highlightablePath';
+F1DataVis.IdStore.ApologyMessage1 = 'We are sorry! The data for the';
+F1DataVis.IdStore.ApologyMessage2 = 'does not exist.';
 
 F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     var self = this,
@@ -36,6 +38,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _leftButtonRestPos,
         _rightButtonRestPos,
         _buttonYPos,
+        _apologyMessage = [F1DataVis.IdStore.ApologyMessage1, '', F1DataVis.IdStore.ApologyMessage2],
         _initializeClipping = function () {
             _clipRect = d3.select( _paracoordParentGrp )
                 .append( 'clipPath' )
@@ -305,7 +308,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.drawRace = function ( race, negator ) {
-        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length, racialParams,
+        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length, racialParams, group,
             lapScales = new Map(),
             translateFromAttr, translateToAttr,
             getXPositionOfLap;
@@ -375,13 +378,37 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 drivers: [], driverObjects: [], numberOfLaps: 0, lapScales: [], getXPositionOfLap: undefined, paths: [], leftButtonPos: _leftButtonRestPos, rightButtonPos: _rightButtonRestPos, dashBoardBound: {}
             };
             if ( driverObjects === undefined ) {
-                // TODO: Create text to display error apology.
                 this.raceGrp[_displayedRaceId]
                     .attr( 'transform', translateFromAttr )
                     .transition()
                     .duration( _transitionSpeed )
                     .attr( 'transform', translateToAttr );
-                        
+
+                //Append sad boy.
+                this.raceGrp[_displayedRaceId]
+                    .append( 'image' )
+                    .attr( 'x', this.width / 2 - 125 )
+                    .attr( 'y', 20 )
+                    .attr( 'height', 200 )
+                    .attr( 'width', 200 )
+                    .attr( 'href', './images/sadBoy.png' );
+
+                // Create apology message.
+                length = _apologyMessage.length;
+                _apologyMessage[1] = race.name;
+                group = this.raceGrp[_displayedRaceId]
+                    .append( 'g' )
+                    .attr( 'id', 'ApologyTextGroup_' + _displayedRaceId )
+                    .attr( 'class', 'apologyText' );
+                for ( i = 0; i < length; i++ ) {
+                    group
+                        .append( 'text' )
+                        .attr( 'x', this.width / 2 )
+                        .attr( 'y', 260 + ( i * 40 ))
+                        .attr( 'fill', '#dfdfdf' )
+                        .attr( "text-anchor", "middle" )
+                        .text( _apologyMessage[i]);
+                }                        
             } else {
                 length = driverObjects.length;
                 for ( i = 0; i < length; i++ ) {

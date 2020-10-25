@@ -47,7 +47,7 @@ F1DataVis.button = function ( parent, x, y, size, id, isLeft, cbFunction ) {
                 .attr( 'rx', _size * 0.25 )
                 .attr( 'ry', _size * 0.25 )
                 .attr( 'stroke', '#005AD4' )
-                .attr( 'stroke-width', 2 );
+                .attr( 'stroke-width', 1 );
             _buttonSVG
                 .append( 'path' )
                 .attr( 'stroke', '#E70000' )

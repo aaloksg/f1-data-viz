@@ -1,26 +1,25 @@
 Reference slider - https://github.com/johnwalley/d3-simple-slider
 
-- Stylize lines
-	- Style linecaps. - Both.
-
-- Stylize fonts
-
-- Check colour schemes.
+- Add tooltip to show status, name and team name.
 
 - Implement viridis - for colourblind.
 
+- Stylize lines
+	- Style linecaps. - Both.
+
+- Check colour schemes.
+
 - Set display to none/hidden after animating out, and to visible/true before animating in. - Both
 
-- Add error page
 
-- Add highlights to names and end positions.
-
-- Add logo
-
-- BrasilGP 2014 check 
+- Add highlights to names and end positions. - Not needed if we implement tooltips.
+- Make texts unselectable if needed. - NO.
 
 
-
+- Stylize fonts - done
+- Add logo - done
+- BrasilGP 2014 check - Done
+- Add error page - Done
 - Add RaceGrp to objects - Done
 - Initial delay - done.
 - Add 'Laps' and 'Races' indices.
@@ -38,8 +37,6 @@ Reference slider - https://github.com/johnwalley/d3-simple-slider
 - Polyline drawing for season - Done.
 - Font family of slider texts - Done
 - Font colour scheme of slider texts. - Done
-
-- Make texts unselectable if needed. - NO.
 
 Bugs:
 - Some laptimes don't exist - we will add error page.
