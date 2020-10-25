@@ -15,7 +15,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _paracoordHolder,
         _visualizer = visualizer,
         _marginProps = { left: 120, top: 20, right: 100, bottom: 50 },
-        _clippingProps = { left: 10, top: 5, right: 10, bottom: -20 },
+        _clippingProps = { left: 10, top: 5, right: 10, bottom: -10 },
         _displayedYear,
         _displayingYear = true,
         _displayedRaceId,
@@ -35,6 +35,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _rightButton,
         _leftButtonRestPos,
         _rightButtonRestPos,
+        _buttonYPos,
         _initializeClipping = function () {
             _clipRect = d3.select( _paracoordParentGrp )
                 .append( 'clipPath' )
@@ -125,10 +126,11 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _paracoordParentGrp.appendChild( _paracoordHolder );
         _initializeClipping();
 
+        _buttonYPos = this.height - _buttonSize * 0.8;
         _leftButtonRestPos = -2 * this.width;
-        _leftButton = new F1DataVis.button( _svgParent, _leftButtonRestPos, this.height - _buttonSize * 0.8, _buttonSize, '_LeftRaceButton', true, _onRaceChanged );
+        _leftButton = new F1DataVis.button( _svgParent, _leftButtonRestPos, _buttonYPos, _buttonSize, '_LeftRaceButton', true, _onRaceChanged );
         _rightButtonRestPos = 2 * this.width;
-        _rightButton = new F1DataVis.button( _svgParent, _rightButtonRestPos, this.height - _buttonSize * 0.8, _buttonSize, '_RightRaceButton', false, _onRaceChanged );
+        _rightButton = new F1DataVis.button( _svgParent, _rightButtonRestPos, _buttonYPos, _buttonSize, '_RightRaceButton', false, _onRaceChanged );
     };
 
     this.drawSeason = function ( year ) {
@@ -145,6 +147,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' );
             _leftButton.transitionX( _leftButtonRestPos );
             _rightButton.transitionX( _rightButtonRestPos );
+            _visualizer.updateDashBoard( );
 
             _displayingYear = true;
 
@@ -259,7 +262,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisLeft( raceScales.get( race.round ) ) );
                 } else {
                     if ( index === races.length ) {
-                        d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisRight( raceScales.get( race.round ) ) );
+                        d3.select( this ).attr( "class", "rightAxisLabels" ).call( d3.axisRight( raceScales.get( race.round ) ) );
                     } else {
                         d3.select( this )
                             .append( "path" )
@@ -280,12 +283,15 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 var raceNameFormatted = race.name.split( ' ' );
                 var textGroup = d3.select( this )
                     .append( "g" )
-                    .attr( 'id', race => 'Year_' + _displayedYear + '_Round_' + race.round + '_TextGroup' )
-                    .attr( "class", "axisXLabels" );
+                    .attr( 'id', race => 'Year_' + _displayedYear + '_Round_' + race.round + '_TextGroup' );
+                    
                 if ( index === 0 ) {
                     textGroup
                         .attr( "class", "axisXLabels first" );
                 }
+                else  {  textGroup.attr( "class", "axisXLabels highlightableText" );
+            }
+
                 for ( i = 0; i < raceNameFormatted.length; i++ ) {
                     textGroup.append( "text" )
                         .attr( "x", 0 )
@@ -366,7 +372,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             driverObjects = F1DataVis.dataHandler.getDriverObjByPolePositions( _displayedRaceId ); //TODO if driverObjs = undefined 
 
             this.racialParams[_displayedRaceId] = racialParams = {
-                drivers: [], driverObjects: [], numberOfLaps: 0, lapScales: [], getXPositionOfLap: undefined, paths: [], leftButtonPos: _leftButtonRestPos, rightButtonPos: _rightButtonRestPos
+                drivers: [], driverObjects: [], numberOfLaps: 0, lapScales: [], getXPositionOfLap: undefined, paths: [], leftButtonPos: _leftButtonRestPos, rightButtonPos: _rightButtonRestPos, dashBoardBound: {}
             };
             if ( driverObjects === undefined ) {
                 // TODO: Create text to display error apology.
@@ -424,12 +430,18 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .attr( "x", self.width / 2 )
                 .attr( "y", self.height )
                 .attr( 'class', 'raceNameText' )
+                .attr( 'fill', '#dfdfdf' )
                 .attr( "text-anchor", "middle" )
                 .text( race.name ),
                 textBBox = raceNametext._groups[0][0].getBBox();
             racialParams.leftButtonPos = self.width / 2 - textBBox.width / 2 - _buttonSize - _buttonToTextGap;
             racialParams.rightButtonPos = self.width / 2 + textBBox.width / 2 + _buttonToTextGap;
-
+            racialParams.dashBoardBound.topLeft = {
+                x: racialParams.leftButtonPos, y: _buttonYPos
+            };
+            racialParams.dashBoardBound.topRight = {
+                x: racialParams.rightButtonPos + _buttonSize, y: _buttonYPos
+            };
             //raceNametext.attr( 'font-size', '30px' )
             //    .transition()
             //    .duration( 4000 )
@@ -453,6 +465,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         } else {
             _rightButton.transitionX( racialParams.rightButtonPos );
         }
+        _visualizer.updateDashBoard( racialParams.dashBoardBound );
     };
 
     this.drawRaceAxes = function ( translateFromAttr, translateToAttr ) {
@@ -483,7 +496,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisLeft( lapScales.get( text.lap ) ) );
                 } else {
                     if ( index === numberOfLaps ) {
-                        d3.select( this ).attr( "class", "axisLabels" ).call( d3.axisRight( lapScales.get( text.lap ) ) );
+                        d3.select( this ).attr( "class", "rightAxisLabels" ).call( d3.axisRight( lapScales.get( text.lap ) ) );
                     } else {
                         d3.select( this )
                             .append( "path" )
@@ -712,6 +725,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .attr( 'transform', 'translate(0,' + ( this.height * -1.5 ) + ')' );
             _leftButton.transitionX( _leftButtonRestPos );
             _rightButton.transitionX( _rightButtonRestPos );
+            _visualizer.updateDashBoard( );
 
             _displayingYear = true;
 
@@ -722,5 +736,9 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .duration( _transitionSpeed )
                 .attr( 'transform', 'translate(0,0)' );
         }
+    };
+
+    this.getDashBoardBounds = function() {
+        return this.racialParams[_displayedRaceId].dashBoardBound;
     };
 }

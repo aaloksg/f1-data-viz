@@ -2,17 +2,22 @@ var F1DataVis = F1DataVis || {};
 F1DataVis.IdStore = F1DataVis.IdStore || {};
 
 F1DataVis.IdStore.sliderParent = 'sliderGrp';
+F1DataVis.IdStore.sliderDash = 'sliderDashGrp';
+
 
 F1DataVis.timeSlider = function ( parent, visualizer ) {
     var _height = 0,
+        _width = 0,
         _yPos = 0,
         _xPos = 0,
         _parent = parent,
         _visualizer = visualizer,
-        _marginProps = { left: 100, right: 100, top: 20, bottom: 20 },
-
+        _marginProps = {left: 100, right: 100, top: 20, bottom: 20},
+        self = this,
         _sliderGroup = null,
         _timeSlider = null,
+        _dashBoard = null,
+        _dashPath = [],
 
         // Year range
         _years = d3.range( 1996, 2017 ),
@@ -34,12 +39,21 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
             // Change font of pointer label.
             d3.select( _parent )
                 .selectAll( '.parameter-value text' )
-                .attr( 'font-size', 20 )
+                .attr( 'font-size', 22 )
                 //.attr('font-style', 'italic')
                 .attr( 'font-weight', 'bold' )
                 .attr( 'font-family', 'bahnschrift' )
                 .attr( 'y', -31 )
-                .attr( 'fill', '#E70000' );
+                .attr( 'fill', '#E70000' )
+                .on( 'mousedown', function () {
+                    this.setAttribute( 'cursor', 'grabbing' );
+                } )
+                .on( 'mouseup', function () {
+                    this.setAttribute( 'cursor', 'grab' );
+                } )
+                .on( 'mouseout', function () {
+                    this.setAttribute( 'cursor', 'grab' );
+                } );
 
             // Change slider size.
             d3.select( _parent )
@@ -52,17 +66,75 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
                 .attr( 'stroke', '#005AD4' );
             d3.select( _parent )
                 .selectAll( '.handle' )
+                .attr( 'cursor', 'grab' )
                 .attr( 'stroke-width', 3 )
                 .attr( 'fill', 'silver' )
                 .attr( 'stroke', 'red' )
                 .attr( 'd', 'M-6.5,-6.5 v 15 l 6,7.5 l 6,-7.5 v -15 z' )
-                .attr( 'tabindex', null )
-                .on( 'click', _visualizer.onSliderHandleClicked ); // Remove tabindex to make it unselectable.
+                .attr( 'tabindex', null ) // Remove tabindex to make it unselectable.
+                .on( 'click', _visualizer.onSliderHandleClicked )
+                .on( 'mousedown', function () {
+                    this.setAttribute( 'cursor', 'grabbing' );
+                } )
+                .on( 'mouseup', function () {
+                    this.setAttribute( 'cursor', 'grab' );
+                } )
+                .on( 'mouseout', function () {
+                    this.setAttribute( 'cursor', 'grab' );
+                } );
+        },
+        _getDashBoardPositions = function () {
+            _dashPath.push( [-_visualizer.width / 2, _visualizer.height] );
+            _dashPath.push( [-_visualizer.width / 2, self.yPosition + _marginProps.top / 2] );
+            //Dummy points
+            _dashPath.push( [-_visualizer.width / 2, self.yPosition + _marginProps.top / 2] );
+            _dashPath.push( [-_visualizer.width / 2, self.yPosition + _marginProps.top / 2] );
+            _dashPath.push( [_visualizer.width + 100, self.yPosition + _marginProps.top / 2] );
+            _dashPath.push( [_visualizer.width + 100, self.yPosition + _marginProps.top / 2] );
+            //
+            _dashPath.push( [_visualizer.width + 100, self.yPosition + _marginProps.top / 2] );
+            _dashPath.push( [_visualizer.width + 100, _visualizer.height] );
+            return _dashPath;
 
         };
 
+
+
+
     this.yPosition = 0;
     this.xPosition = 0;
+
+
+    this.drawDashBoard = function () {
+        _sliderGroup = d3.select( _parent )
+            .insert( 'g', ":first-child" )
+            .attr( 'id', F1DataVis.IdStore.sliderDash );
+        _dashBoard = _sliderGroup
+            .append( 'path' )
+            .attr( 'class', 'shadow' )
+            .attr( 'fill', F1DataVis.IdStore.DashBoardGradURL )
+            .attr( 'stroke', '#E70000' )
+            .attr( 'd', d3.line()( _getDashBoardPositions() ) );
+    }
+
+    this.updateDashBoard = function ( bounds ) {
+        var newDashPath;
+        if ( bounds === undefined ) {
+            newDashPath = _dashPath;
+        }
+        else {
+            newDashPath = _dashPath.map( item => item.slice() );
+            newDashPath[2][0] = bounds.topLeft.x - 30;
+            newDashPath[3][0] = bounds.topLeft.x;
+            newDashPath[3][1] = bounds.topLeft.y - 10;
+            newDashPath[4][0] = bounds.topRight.x;
+            newDashPath[4][1] = bounds.topRight.y - 10;
+            newDashPath[5][0] = bounds.topRight.x + 30;
+        }
+        _dashBoard.transition()
+            .duration( 1500 )
+            .attr( 'd', d3.line()( newDashPath ) );
+    }
 
     this.draw = function () {
 
@@ -79,9 +151,9 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
             .step( 1 )
             .width( _visualizer.width - _marginProps.left - _marginProps.right )
             .tickFormat( d3.format( '' ) )
-            .tickValues( d3.range( 1996, 2018, 2 ))//.concat( [2017] ) )
+            .tickValues( d3.range( 1996, 2018, 2 ) )//.concat( [2017] ) )
             .default( 2017 )
-            .on( 'onchange', _visualizer.sliderMoved);
+            .on( 'onchange', _visualizer.sliderMoved );
 
         // Append slider
         _sliderGroup.call( _timeSlider );
@@ -89,11 +161,19 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
         _tweakSliderLook();
 
         _height = _sliderGroup._groups[0][0].getBBox().height;
+        _width = _sliderGroup._groups[0][0].getBBox().width;
         this.yPosition = _visualizer.height - _height - _marginProps.bottom - _marginProps.top;
 
         _yPos = this.yPosition + _marginProps.top + _height / 2;
         _xPos = this.xPosition + _marginProps.left;
         _sliderGroup.attr( 'transform', 'translate(' + _xPos + ',' + _yPos + ')' );
+        this.drawDashBoard();
+        _sliderGroup.append( 'image' )
+            .attr( 'x', 0 )
+            .attr( 'y', this.yPosition )
+            .attr( 'height', 75 )
+            .attr( 'width',75 )
+            .attr( 'href', './images/F1-Logo.png' );
 
     };
 

@@ -2,7 +2,7 @@ svg {
     overflow: hidden;
     overflow-x: hidden;
     overflow-y: hidden;
-    background-color: #89CEFF;
+    background-color: #061f37;
 }
 
 .axisLabels path:not(.highlightableElement) {
@@ -17,6 +17,22 @@ svg {
     fill: #005AD4;
     stroke-width: 0.5px;
     font-size: 15px;
+    text-shadow: 0px 0px 4px black;
+}
+
+.rightAxisLabels path:not(.highlightableElement) {
+    stroke: #E70000;
+    stroke-width: 2;
+}
+
+.rightAxisLabels text {
+    font-family: Bahnschrift;
+    font-style: italic;
+    font-weight: bold;
+    fill: #E70000;
+    stroke-width: 0.5px;
+    font-size: 15px;
+    text-shadow: 0px 0px 4px black;
 }
 .axisXLabels text {
     font-family: Bahnschrift;
@@ -25,17 +41,20 @@ svg {
     stroke-width: 0.5px;
     font-size: 10px;
     font-style: normal;
+    text-shadow: 0px 0px 4px black;
 }
 .axisXLabels.first text {
     fill: #E70000;
     font-size: 12px;
+
 }
 .raceNameText {
     font-family: Bahnschrift;
     font-weight: bold;
-    fill: #005AD4;
+    fill: #dfdfdf;
     font-size: 30px;
     font-style: normal;
+   
 }
 
 .button rect {
@@ -54,6 +73,10 @@ svg {
     stroke-opacity: 0.25;
 }
 
+.highlighted .highlightableText {
+    text-shadow: 0px 0px 4px red !important;
+}
+
 .highlightedPath {
     stroke-opacity: 1;
 }
@@ -64,4 +87,7 @@ svg {
 
 .deHilightedGroup .highlightablePath {
     stroke-opacity: 1;
+}
+.shadow {
+   filter : drop-shadow( 0 4px 3px red );
 }
