@@ -25,9 +25,10 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _displayedRaceIndex = 0,
         _transitionSpeed = 2000,
         _midAxisColor = "#005AD4",
+        _midAxisShadowColor = _midAxisColor,
         _midAxisWidth = 2,
         _midAxisOpacity = 0.25,
-        _midAxisShadowWidth = 20,
+        _midAxisShadowWidth = 15,
         _midAxisShadowOpacity = 0,
         _pathWidth = 5,
         _pathShadowWidth = 10,
@@ -287,7 +288,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]] ) )
                         .attr( 'class', F1DataVis.IdStore.highlightableElementClass )
                         .attr( "stroke-width", _midAxisShadowWidth )
-                        .attr( "stroke", _midAxisColor )
+                        .attr( "stroke", _midAxisShadowColor )
                         .attr( "stroke-opacity", _midAxisShadowOpacity );
                 }
 
@@ -545,7 +546,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         .append( "path" )
                         .attr( "d", d3.line()( [[0, _marginProps.top], [0, self.height - _marginProps.bottom]] ) )
                         .attr( "stroke-width", _midAxisShadowWidth )
-                        .attr( "stroke", _midAxisColor )
+                        .attr( "stroke", _midAxisShadowColor )
                         .attr( "stroke-opacity", _midAxisShadowOpacity );
                 }
                 var raceNameFormatted = text.text.split( ' ' ), i,

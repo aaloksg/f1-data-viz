@@ -79,7 +79,8 @@ svg {
 }
 
 .highlighted .highlightableElement {
-    stroke-opacity: 0.25;
+/*    stroke-opacity: 0.25;*/
+    animation: raceaxis-anim-glow 1s ease infinite;
 }
 
 .highlighted .highlightableText {
@@ -121,7 +122,7 @@ svg {
 
 }
 
-@keyframes handel-anim-glow {
+@keyframes handle-anim-glow {
     0% {
         stroke-width: 3;
         stroke-opacity: 1;
@@ -139,6 +140,23 @@ svg {
 }
 
 
+@keyframes raceaxis-anim-glow {
+    0% {
+        stroke-width: 20;
+        stroke-opacity: 0.5;
+    }
+
+    50% {
+        stroke-width: 15;
+        stroke-opacity: 0;
+    }
+
+    100% {
+        stroke-width: 20;
+        stroke-opacity: 0.5;
+    }
+}
+
 .handle {
-    animation: handel-anim-glow 1s ease infinite;
+    animation: handle-anim-glow 1s ease infinite;
 }
