@@ -129,7 +129,49 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
 
             defs.appendChild( linearGrad );
         },
-        _onLogoClicked = function (),
+        _onLogoClicked = function () {
+            // check _displayingVisualization
+            if ( _displayingVisualization ) {
+                _displayingVisualization = false;
+                _introGrp
+                    .attr( 'transform', 'translate(0,' + ( self.height * -1.5 ) + ')' )
+                    .transition()
+                    .duration( _transitionSpeed )
+                    .attr( 'transform', 'translate(0,0)' );
+                _visualizationGrp
+                    .attr( 'transform', 'translate(0,0)' )
+                    .transition()
+                    .duration( _transitionSpeed )
+                    .attr( 'transform', 'translate(0,' + ( self.height * 1.5 ) + ')' );
+                _f1Logo
+                    .transition()
+                    .duration( _transitionSpeed )
+                    .attr( 'x', _logoStyles.largeX )
+                    .attr( 'y', _logoStyles.largeY )
+                    .attr( 'height', _logoStyles.largeHeight )
+                    .attr( 'width', _logoStyles.largeWidth );
+
+            } else {
+                _displayingVisualization = true;
+                _introGrp
+                    .attr( 'transform', 'translate(0,0)' )
+                    .transition()
+                    .duration( _transitionSpeed )
+                    .attr( 'transform', 'translate(0,' + ( self.height * -1.5 ) + ')' );
+                _visualizationGrp
+                    .attr( 'transform', 'translate(0,' + ( self.height * 1.5 ) + ')' )
+                    .transition()
+                    .duration( _transitionSpeed )
+                    .attr( 'transform', 'translate(0,0)' );
+                _f1Logo
+                    .transition()
+                    .duration( _transitionSpeed )
+                    .attr( 'x', _logoStyles.smallX )
+                    .attr( 'y', _logoStyles.smallY )
+                    .attr( 'height', _logoStyles.smallHeight )
+                    .attr( 'width', _logoStyles.smallWidth );
+            }
+        },
         _createTexts = function () {
             F1DataVis.Texts.ClickToStart = 'Click to start!';
             F1DataVis.Texts.IntroTexts = {
