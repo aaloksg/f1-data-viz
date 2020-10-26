@@ -1,5 +1,6 @@
 var F1DataVis = F1DataVis || {};
 F1DataVis.IdStore = F1DataVis.IdStore || {};
+F1DataVis.Texts = F1DataVis.Texts || {};
 F1DataVis.IdStore.paracoordHolder = 'paracoordHolderGrp'
 F1DataVis.IdStore.paracoordParentGrp = 'paracoordParentGrp';
 F1DataVis.IdStore.paracoordClipper = 'paracoordClipper';
@@ -7,9 +8,9 @@ F1DataVis.IdStore.highlightedElementClass = 'highlighted';
 F1DataVis.IdStore.highlightableElementClass = 'highlightableElement';
 F1DataVis.IdStore.dehighlightedGroupClass = 'deHilightedGroup';
 F1DataVis.IdStore.highlightablePathClass = 'highlightablePath';
-F1DataVis.IdStore.ApologyMessage1 = 'We are sorry! The data for the';
-F1DataVis.IdStore.ApologyMessage2 = 'does not exist.';
-F1DataVis.IdStore.tooltip = 'F1DataVisTooltip';
+F1DataVis.Texts.ApologyMessage1 = 'We are sorry! The data for the';
+F1DataVis.Texts.ApologyMessage2 = 'does not exist.';
+F1DataVis.Texts.tooltip = 'F1DataVisTooltip';
 
 F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     var self = this,
@@ -40,9 +41,9 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _leftButtonRestPos,
         _rightButtonRestPos,
         _buttonYPos,
-        _apologyMessage = [F1DataVis.IdStore.ApologyMessage1, '', F1DataVis.IdStore.ApologyMessage2],
+        _apologyMessage = [F1DataVis.Texts.ApologyMessage1, '', F1DataVis.Texts.ApologyMessage2],
         _initializeClipping = function () {
-            _clipRect = d3.select( _paracoordParentGrp )
+            _clipRect = _paracoordParentGrp
                 .append( 'clipPath' )
                 .attr( 'id', F1DataVis.IdStore.paracoordClipper )
                 .append( 'rect' );
@@ -51,7 +52,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .attr( 'y', _clippingProps.top )
                 .attr( 'height', self.height - _clippingProps.top - _clippingProps.bottom )
                 .attr( 'width', self.width - _clippingProps.left - _clippingProps.right );
-            d3.select( _paracoordHolder )
+            _paracoordHolder
                 .attr( 'clip-path', 'url(#' + F1DataVis.IdStore.paracoordClipper + ')' );
         },
         _translateSeasonOut = function ( negator ) {
@@ -128,12 +129,12 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     this.initialize = function ( width, height ) {
         this.width = width;
         this.height = height;
-        _paracoordParentGrp = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
-        _paracoordParentGrp.setAttributeNS( null, 'id', F1DataVis.IdStore.paracoordParentGrp );
-        _svgParent.appendChild( _paracoordParentGrp );
-        _paracoordHolder = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
-        _paracoordHolder.setAttributeNS( null, 'id', F1DataVis.IdStore.paracoordHolder );
-        _paracoordParentGrp.appendChild( _paracoordHolder );
+        _paracoordParentGrp = _svgParent
+            .append( 'g' )
+            .attr( 'id', F1DataVis.IdStore.paracoordParentGrp );
+        _paracoordHolder = _paracoordParentGrp
+            .append( 'g' )
+            .attr( 'id', F1DataVis.IdStore.paracoordHolder );
         _initializeClipping();
 
         _buttonYPos = this.height - _buttonSize * 0.8;
@@ -234,7 +235,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 );
             } );
 
-            this.seasonalGrp[_displayedYear] = d3.select( _paracoordHolder )
+            this.seasonalGrp[_displayedYear] = _paracoordHolder
                 .append( "g" )
                 .attr( 'id', 'group_year_' + _displayedYear );
 
@@ -353,7 +354,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         } else {
             // Create the group for the displayed year.
 
-            this.raceGrp[_displayedRaceId] = d3.select( _paracoordHolder )
+            this.raceGrp[_displayedRaceId] = _paracoordHolder
                 .append( "g" )
                 .attr( 'id', 'group_race_' + _displayedRaceId );
 

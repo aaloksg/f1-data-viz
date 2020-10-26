@@ -1,4 +1,5 @@
 var F1DataVis = F1DataVis || {};
+F1DataVis.Texts = F1DataVis.Texts || {};
 F1DataVis.IdStore = F1DataVis.IdStore || {};
 F1DataVis.IdStore.ButtonNormal = 'ButtonNormal_Gradient';
 F1DataVis.IdStore.ButtonPressed = 'ButtonPressed_Gradient';
@@ -13,6 +14,12 @@ F1DataVis.IdStore.TooltipGradURL = 'url(#' + F1DataVis.IdStore.TooltipGrad + ')'
 
 F1DataVis.f1Visualizer = function ( parentSvg ) {
     var self = this,
+        _visualizationGrp,
+        _introGrp,
+        _transitionSpeed = 1500,
+        _displayingVisualization = false,
+        _f1Logo,
+        _logoStyles = {smallWidth: 75, smallHeight: 75, largeWidth: 300, largeHeight: 300, smallX:0, smallY:0, largeX: 0, largeY: 0},
         _createStyles = function () {
             var defs = document.getElementById( F1DataVis.IdStore.defs ), linearGrad, stopElement;
             // Normal gradient
@@ -121,6 +128,13 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
             linearGrad.appendChild( stopElement );
 
             defs.appendChild( linearGrad );
+        },
+        _onLogoClicked = function (),
+        _createTexts = function () {
+            F1DataVis.Texts.ClickToStart = 'Click to start!';
+            F1DataVis.Texts.IntroTexts = {
+                line1: ''
+            };
         };
 
     this.width = 0;
@@ -134,16 +148,40 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
     this.initialize = function ( width, height ) {
         this.width = width;
         this.height = height;
-        this.slider = new F1DataVis.timeSlider( this.parentSvg, this );
-        this.parallelCoords = new F1DataVis.paraCoorder( this.parentSvg, this );
+        _visualizationGrp = d3.select( this.parentSvg )
+            .append( 'g' )
+            .attr( 'id', 'VisualizationGrp' );
+        _introGrp = d3.select( this.parentSvg )
+            .append( 'g' )
+            .attr( 'id', 'IntroductionGrp' );
+        this.slider = new F1DataVis.timeSlider( _visualizationGrp, this );
+        this.parallelCoords = new F1DataVis.paraCoorder( _visualizationGrp, this );
 
         _createStyles();
+
+        _logoStyles.largeX = width / 2 - _logoStyles.largeWidth / 2;
+        _logoStyles.largeY = height / 2 - _logoStyles.largeHeight;
+
+        _f1Logo = d3.select( this.parentSvg )
+            .append( 'image' )
+            .attr( 'x', _logoStyles.largeX )
+            .attr( 'y', _logoStyles.largeY )
+            .attr( 'height', _logoStyles.largeHeight )
+            .attr( 'width', _logoStyles.largeWidth )
+            .attr( 'href', './images/F1-Logo.png' )
+            .on( 'click', _onLogoClicked );
+
+        _visualizationGrp.attr( 'transform', 'translate(0,' + ( height * 1.5 ) + ')' );
     };
 
     this.draw = function () {
         this.slider.draw();
+        _logoStyles.smallX = 0;
+        _logoStyles.smallY = this.slider.yPosition;
         this.parallelCoords.initialize( this.width, this.slider.yPosition );
         this.sliderMoved( this.slider.getValue() );
+
+        this.drawIntroduction();
     };
 
     this.update = function ( width, height ) {
@@ -163,15 +201,18 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
     };
 
     this.onSliderHandleClicked = function () {
-        self.parallelCoords.sliderHandleClicked( self.slider.getValue());
-    }
+        self.parallelCoords.sliderHandleClicked( self.slider.getValue() );
+    };
 
     this.updateDashBoard = function ( bounds ) {
         this.slider.updateDashBoard( bounds );
-    }
+    };
 
     this.getDashBoardBounds = function () {
-
         return this.paraCoorder.getDashBoardBounds();
-    }
+    };
+
+    this.drawIntroduction = function (){
+
+    };
 }

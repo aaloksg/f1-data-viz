@@ -24,7 +24,7 @@ F1DataVis.tooltip = function ( parent, id, parentWidth, parentHeight ) {
         _init = function () {
             var length = _texts.length, i;
             // Create group for slider and append to main svg
-            _tooltipSvg = d3.select( _parent )
+            _tooltipSvg = _parent
                 .append( 'g' )
                 .attr( 'id', _id )
                 .attr( 'class', F1DataVis.IdStore.tooltipClass )

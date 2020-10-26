@@ -18,7 +18,7 @@ F1DataVis.button = function ( parent, x, y, size, id, isLeft, cbFunction ) {
         _init = function () {
 
         // Create group for slider and append to main svg
-            _buttonSVG = d3.select( _parent )
+            _buttonSVG = _parent
                 .append( 'g' )
                 .attr( 'id', _id )
                 .attr( 'class', F1DataVis.IdStore.buttonClass )

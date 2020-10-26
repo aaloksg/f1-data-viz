@@ -1,4 +1,6 @@
+Data - https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020
 Reference slider - https://github.com/johnwalley/d3-simple-slider
+F1 image.
 
 
 
