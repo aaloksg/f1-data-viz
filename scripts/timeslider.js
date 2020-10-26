@@ -68,7 +68,7 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
                 .selectAll( '.handle' )
                 .attr( 'cursor', 'grab' )
                 .attr( 'stroke-width', 3 )
-                .attr( 'fill', 'silver' )
+                .attr( 'fill', '#061f37' )
                 .attr( 'stroke', 'red' )
                 .attr( 'd', 'M-6.5,-6.5 v 15 l 6,7.5 l 6,-7.5 v -15 z' )
                 .attr( 'tabindex', null ) // Remove tabindex to make it unselectable.

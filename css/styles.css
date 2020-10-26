@@ -81,7 +81,8 @@ svg {
 }
 
 .highlighted .highlightableText {
-    text-shadow: 0px 0px 4px red !important;
+    stroke : #E70000;
+    animation: anim-glow 1s ease infinite;
 }
 
 .highlightedPath {
@@ -98,3 +99,44 @@ svg {
 .shadow {
    filter : drop-shadow( 0 4px 3px red );
 }
+
+@keyframes anim-glow {
+    0% {
+        stroke-width: 1;
+        stroke-opacity: 1;
+    }
+
+    50% {
+        stroke-width: 9;
+        stroke-opacity: 0;
+    }
+    100% {
+        stroke-width: 3;
+        stroke-opacity: 1;
+    }
+
+
+}
+
+@keyframes handel-anim-glow {
+    0% {
+        stroke-width: 3;
+        stroke-opacity: 1;
+    }
+
+    50% {
+        stroke-width: 8;
+        stroke-opacity: 0.6;
+    }
+
+    100% {
+        stroke-width: 3;
+        stroke-opacity: 1;
+    }
+}
+
+
+.handle {
+    animation: handel-anim-glow 1s ease infinite;
+}
+
