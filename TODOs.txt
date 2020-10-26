@@ -1,6 +1,8 @@
 Reference slider - https://github.com/johnwalley/d3-simple-slider
 
-- Add tooltip to show status, name and team name.
+
+
+- Start page with info and introduction of us.
 
 - Implement viridis - for colourblind.
 
@@ -11,11 +13,16 @@ Reference slider - https://github.com/johnwalley/d3-simple-slider
 
 - Set display to none/hidden after animating out, and to visible/true before animating in. - Both
 
+- Add touchdown to display tooltip and highlight the polylines as well.
+
 
 - Add highlights to names and end positions. - Not needed if we implement tooltips.
 - Make texts unselectable if needed. - NO.
+- Handler glow animation for the paths. - Nah.
 
 
+- Handler glow - Done
+- Add tooltip to show status, name and team name. - Done
 - Stylize fonts - done
 - Add logo - done
 - BrasilGP 2014 check - Done

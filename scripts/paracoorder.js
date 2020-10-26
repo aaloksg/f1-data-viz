@@ -9,6 +9,7 @@ F1DataVis.IdStore.dehighlightedGroupClass = 'deHilightedGroup';
 F1DataVis.IdStore.highlightablePathClass = 'highlightablePath';
 F1DataVis.IdStore.ApologyMessage1 = 'We are sorry! The data for the';
 F1DataVis.IdStore.ApologyMessage2 = 'does not exist.';
+F1DataVis.IdStore.tooltip = 'F1DataVisTooltip';
 
 F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     var self = this,
@@ -29,7 +30,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _midAxisShadowWidth = 20,
         _midAxisShadowOpacity = 0,
         _pathWidth = 5,
-        _pathShadowWidth = _midAxisShadowWidth,
+        _pathShadowWidth = 10,
         _buttonSize = 25,
         _buttonToTextGap = 10,
         _clipRect,
@@ -104,6 +105,11 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             }
             race = self.seasonalParams[_displayedYear].races[_displayedRaceIndex];
             self.drawRace( race, negator )
+        },
+        _moveTooltip = function ( event ) {
+            var splittedId = event.currentTarget.id.split( '_' ), driverId = parseInt( splittedId.pop(), 10 ),
+                tooltipData = F1DataVis.dataHandler.getTooltipData( _displayedRaceId, driverId );
+            self.tooltip.show( event.clientX, event.clientY, tooltipData );
         };
 
     this.width = 0;
@@ -134,6 +140,8 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _leftButton = new F1DataVis.button( _svgParent, _leftButtonRestPos, _buttonYPos, _buttonSize, '_LeftRaceButton', true, _onRaceChanged );
         _rightButtonRestPos = 2 * this.width;
         _rightButton = new F1DataVis.button( _svgParent, _rightButtonRestPos, _buttonYPos, _buttonSize, '_RightRaceButton', false, _onRaceChanged );
+
+        this.tooltip = new F1DataVis.tooltip( _paracoordParentGrp, F1DataVis.IdStore.tooltip, this.width - _marginProps.right, this.height - _marginProps.bottom );
     };
 
     this.drawSeason = function ( year ) {
@@ -648,14 +656,19 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .selectAll( "path" )
                 .data( driverObjects )
                 .join( "g" )
-                .attr( 'id', driver => 'Year_' + _displayedYear + '_race_' + _displayedRaceId + '_driver_' + driver.driverId + '_group' )
+                .attr( 'id', driver => 'Year_' + _displayedYear + '_race_' + _displayedRaceId + '_group' + '_driver_' + driver.driverId )
                 .on( 'mouseover', function () {
                     this.parentElement.classList.add( F1DataVis.IdStore.dehighlightedGroupClass );
                     this.classList.add( F1DataVis.IdStore.highlightablePathClass );
                 } )
+                .on( 'mousemove', function (event) {
+                    // Add tooltip
+                    _moveTooltip( event );
+                } )
                 .on( 'mouseout', function () {
                     this.parentElement.classList.remove( F1DataVis.IdStore.dehighlightedGroupClass );
                     this.classList.remove( F1DataVis.IdStore.highlightablePathClass );
+                    self.tooltip.hide();
                 } )
                 .each( function ( driver ) {
                     var points = d3.range( 0, numberOfLaps + 1 ).map( lap => {
@@ -667,7 +680,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         else {
                             if ( drivers[driver.driverId][lap - 1] === undefined ) {
                                 if ( drivers[driver.driverId][lap - 2] === undefined || lap === numberOfLaps ) {
-                                    return [];
+                                    return null;
                                 }
                                 y = self.getYCoordinateOfDriver( lap, driverObjects.length );
                             }
@@ -677,7 +690,10 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                             }
                         }
                         return [x, y];
-                    } );
+                    } ), nullIndex;
+                    while ( ( index = points.indexOf( null ) ) > -1 ) {
+                        points.splice( index, 1 );
+                    }
                     path = d3.select( this )
                         .append( 'path' )
                         .attr( 'id', driver => 'Year_' + _displayedYear + '_race_' + _displayedRaceId + '_driver_' + driver.driverId + '_path' )

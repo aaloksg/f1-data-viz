@@ -34,6 +34,7 @@ svg {
     font-size: 15px;
     text-shadow: 0px 0px 4px black;
 }
+
 .axisXLabels text {
     font-family: Bahnschrift;
     font-weight: bold;
@@ -43,11 +44,12 @@ svg {
     font-style: normal;
     text-shadow: 0px 0px 4px black;
 }
+
 .axisXLabels.first text {
     fill: #E70000;
     font-size: 12px;
-
 }
+
 .raceNameText {
     font-family: Bahnschrift;
     font-weight: bold;
@@ -96,6 +98,7 @@ svg {
 .deHilightedGroup .highlightablePath {
     stroke-opacity: 1;
 }
+
 .shadow {
    filter : drop-shadow( 0 4px 3px red );
 }
@@ -139,4 +142,3 @@ svg {
 .handle {
     animation: handel-anim-glow 1s ease infinite;
 }
-

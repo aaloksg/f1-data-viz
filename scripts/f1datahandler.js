@@ -5,10 +5,13 @@ F1DataVis.data.racesByYear = {};
 F1DataVis.data.teamIdsByYear = {};
 F1DataVis.data.teamsById = {};
 F1DataVis.data.driversById = {};
+F1DataVis.data.statusesById = {};
 F1DataVis.data.constructorStandingsByRaceId = {};
 F1DataVis.data.laptimesByRaceId = {};
 F1DataVis.data.positionsByTeamByRound = {};
 F1DataVis.data.polePositionsByRaceId = {};
+F1DataVis.data.resultByRaceDriver = {};
+F1DataVis.data.tooltipData = {};
 
 F1DataVis.dataHandler.initializeData = function () {
     var length, i, item, races;
@@ -62,6 +65,10 @@ F1DataVis.dataHandler.initializeData = function () {
                 } );
         }
 
+    }
+    length = F1DataVis.data.status.length;
+    for ( i = 0; i < length; i++ ) {
+        F1DataVis.data.statusesById[F1DataVis.data.status[i].statusId] = F1DataVis.data.status[i].status;
     }
 
 
@@ -258,5 +265,50 @@ F1DataVis.dataHandler.getDriverObjByPolePositions = function ( raceId ) {
         return undefined;
     }
     return F1DataVis.data.polePositionsByRaceId[raceId].map( item => F1DataVis.dataHandler.getDriversByID( item.driverId ) );
-    
+
+};
+
+F1DataVis.dataHandler.getResultDetails = function ( raceId, driverId ) {
+    var result, results, length, i;
+    if ( F1DataVis.data.resultByRaceDriver[raceId + '_' + driverId] ) {
+        result = F1DataVis.data.resultByRaceDriver[raceId + '_' + driverId];
+    } else {
+        results = F1DataVis.data.results;
+        length = results.length;
+        for ( i = 0; i < length; i++ ) {
+            if ( results[i].raceId === raceId && results[i].driverId === driverId ) {
+                F1DataVis.data.resultByRaceDriver[raceId + '_' + driverId] = result = results[i];
+                break;
+            }
+        }
+    }
+    return result;
+};
+
+F1DataVis.dataHandler.getStatusByID = function ( statusId ) {
+    return F1DataVis.data.statusesById[statusId];
+};
+
+
+F1DataVis.dataHandler.getTooltipData = function ( raceId, driverId ) {
+    var tooltipData,
+        result,
+        teamInfo,
+        driverInfo,
+        status;
+    if ( F1DataVis.data.tooltipData ) {
+
+    }
+    if ( F1DataVis.data.tooltipData[raceId + '_' + driverId] ) {
+        tooltipData = F1DataVis.data.tooltipData[raceId + '_' + driverId];
+    } else {
+        result = F1DataVis.dataHandler.getResultDetails( raceId, driverId );
+        teamInfo = F1DataVis.dataHandler.getTeamsByID( result.constructorId );
+        driverInfo = F1DataVis.dataHandler.getDriversByID( driverId );
+        status = F1DataVis.dataHandler.getStatusByID( result.statusId );
+        F1DataVis.data.tooltipData[raceId + '_' + driverId] = tooltipData =
+            [driverInfo.forename + ' ' + driverInfo.surname, teamInfo.name, status];
+    }
+
+    return tooltipData;
 }
