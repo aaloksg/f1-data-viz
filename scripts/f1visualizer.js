@@ -19,7 +19,7 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
         _transitionSpeed = 1500,
         _displayingVisualization = false,
         _f1Logo,
-        _logoStyles = {smallWidth: 75, smallHeight: 75, largeWidth: 300, largeHeight: 300, smallX:0, smallY:0, largeX: 0, largeY: 0},
+        _logoStyles = { smallWidth: 75, smallHeight: 75, largeWidth: 300, largeHeight: 300, smallX: 0, smallY: 0, largeX: 0, largeY: 0 },
         _createStyles = function () {
             var defs = document.getElementById( F1DataVis.IdStore.defs ), linearGrad, stopElement;
             // Normal gradient
@@ -171,12 +171,6 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
                     .attr( 'height', _logoStyles.smallHeight )
                     .attr( 'width', _logoStyles.smallWidth );
             }
-        },
-        _createTexts = function () {
-            F1DataVis.Texts.ClickToStart = 'Click to start!';
-            F1DataVis.Texts.IntroTexts = {
-                line1: ''
-            };
         };
 
     this.width = 0;
@@ -198,7 +192,7 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
             .attr( 'id', 'IntroductionGrp' );
         this.slider = new F1DataVis.timeSlider( _visualizationGrp, this );
         this.parallelCoords = new F1DataVis.paraCoorder( _visualizationGrp, this );
-
+        this.introducer = new F1DataVis.introducer( _introGrp, _logoStyles, this );
         _createStyles();
 
         _logoStyles.largeX = width / 2 - _logoStyles.largeWidth / 2;
@@ -222,8 +216,7 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
         _logoStyles.smallY = this.slider.yPosition;
         this.parallelCoords.initialize( this.width, this.slider.yPosition );
         this.sliderMoved( this.slider.getValue() );
-
-        this.drawIntroduction();
+        this.introducer.draw();
     };
 
     this.update = function ( width, height ) {
@@ -253,8 +246,4 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
     this.getDashBoardBounds = function () {
         return this.paraCoorder.getDashBoardBounds();
     };
-
-    this.drawIntroduction = function (){
-
-    };
-}
+};
