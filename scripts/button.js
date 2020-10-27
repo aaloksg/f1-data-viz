@@ -50,6 +50,7 @@ F1DataVis.button = function ( parent, x, y, size, id, isLeft, cbFunction ) {
                 .attr( 'stroke-width', 1 );
             _buttonSVG
                 .append( 'path' )
+                
                 .attr( 'stroke', '#E70000' )
                 .attr( 'stroke-width', 2 )
                 .attr( 'fill', 'none' )
