@@ -213,8 +213,8 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
         _onLogoClicked = function () {
             // check _displayingVisualization
             if ( _displayingVisualization ) {
-                self.introducer.logoGradAnimCheck( !_displayingVisualization );
                 _displayingVisualization = false;
+                self.introducer.startStopAnim( !_displayingVisualization );
                 _introGrp
                     .attr( 'transform', 'translate(0,' + ( self.height * -1.5 ) + ')' )
                     .transition()
@@ -234,8 +234,8 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
                     .attr( 'width', _logoStyles.largeWidth );
 
             } else {
-                self.introducer.logoGradAnimCheck( !_displayingVisualization );
                 _displayingVisualization = true;
+                self.introducer.startStopAnim( !_displayingVisualization );
                 _introGrp
                     .attr( 'transform', 'translate(0,0)' )
                     .transition()
@@ -290,14 +290,7 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
             .attr( 'width', _logoStyles.largeWidth )
             .attr( 'href', './images/F1-Logo.png' )
             .attr( 'cursor', 'pointer' )
-            .on( 'click', _onLogoClicked )
-            .on( 'mouseover', function () {
-                self.introducer.logoHoverStatus( true );
-
-            } )
-            .on( 'mouseout', function () {
-                self.introducer.logoHoverStatus( false );
-            } );
+            .on( 'click', _onLogoClicked );
 
         _visualizationGrp.attr( 'transform', 'translate(0,' + ( height * 1.5 ) + ')' );
     };
@@ -309,7 +302,7 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
         this.parallelCoords.initialize( this.width, this.slider.yPosition );
         this.sliderMoved( this.slider.getValue() );
         this.introducer.draw();
-        this.introducer.logoGradAnimCheck( !_displayingVisualization );
+        this.introducer.startStopAnim( !_displayingVisualization );
     };
 
     this.update = function ( width, height ) {

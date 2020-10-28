@@ -165,46 +165,50 @@ svg {
     font-family: Bahnschrift;
     font-weight: bold;
     fill: #dfdfdf;
-    font-size: 25px;
+    font-size: 20px;
     font-style: normal;
+    text-shadow: 0px 0px 4px black;
 }
 
 .quoteText {
     font-family: Bahnschrift;
     font-weight: bold;
-    fill: #dfdfdf;
-    font-size: 20px;
+    fill: #005AD4;
+    font-size: 18px;
     font-style: italic;
+    text-shadow: 0px 0px 4px black;
 }
 
 .dataCreditText {
     font-family: Bahnschrift;
     font-weight: bold;
-    fill: #dfdfdf;
-    font-size: 20px;
+    fill: #005AD4;
+    font-size: 14px;
     font-style: normal;
+    text-shadow: 0px 0px 4px black;
 }
 
     .dataCreditText.anchorHover {
         font-family: Bahnschrift;
         font-weight: bold;
         fill: #E70000;
-        font-size: 20px;
         font-style: italic;
     }
 
 .clickToStartText {
     font-family: Bahnschrift;
     font-weight: bold;
-    fill: #dfdfdf;
-    font-size: 20px;
+    fill: #E70000;
+    font-size: 16px;
     font-style: normal;
+    text-shadow: 0px 0px 4px black;
 }
 
 .personalIntroText {
     font-family: Bahnschrift;
     font-weight: bold;
     fill: #dfdfdf;
-    font-size: 16px;
+    font-size: 14px;
     font-style: normal;
+    text-shadow: 0px 0px 4px black;
 }

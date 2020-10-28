@@ -12,13 +12,14 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _visualizer = visualizer,
         _introGrp = introGrp,
         _transitionSpeed = 1500,
-        _localCheck,
+        _doAnimation,
         _logoStyles = logoStyles,
+        _logoCenter = {x:0, y:0},
         _logoButtonMargins = {
-            top: 20,
+            top: 0,
             left: 20,
             right: 20,
-            bottom: 20
+            bottom: 0
         },
         _logoButtonPos = {
             top: 0,
@@ -29,10 +30,11 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _textPositions = {
             margin: {
                 top: 20,
-                left: 30,
-                right: 30,
-                bottom: 10
+                left: 50,
+                right: 50,
+                bottom: 60
             },
+            textGapFactor: 1.5,
             topTextX: 0,
             topTextY: 0,
             topTextAnchor: 'middle',
@@ -53,7 +55,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
             quoteTextX: 0,
             quoteTextY: 0,
             introImageSize: 200,
-            introImageMargin: 10,
+            introImageMargin: 20,
             leftIntroTextX: 0,
             leftIntroTextY: 0,
             leftIntroTextAnchor: 'end',
@@ -91,13 +93,20 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
                 'and the change of positions of drivers in a race.'
             ];
             // [TODO] - Add hyperlink to DataCredit - https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020
-            F1DataVis.Texts.DataCredit = ['Data compiled by Vopani on kaggle.'];
+            F1DataVis.Texts.DataCredit = [
+                'Data compiled by Vopani on kaggle.',
+                'd3 slider created by John Walley.'
+            ];
+            F1DataVis.Texts.DataCreditLinks = [
+                'https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020',
+                'https://github.com/johnwalley/d3-simple-slider'
+            ];
             F1DataVis.Texts.Quote = ['"Races are won at the track.',
                 'Championships are won at the factory."',
                 '- Mercedes( 2019 )'
             ];
-            F1DataVis.Texts.LeftIntro = ['Hey macha', 'yo mama', 'hahaha'];
-            F1DataVis.Texts.RightIntro = ['Hey macha', 'yo mama', 'hahaha'];
+            F1DataVis.Texts.LeftIntro = ['Aalok Shashidhar Gokhale', '121872'];
+            F1DataVis.Texts.RightIntro = ['Ankith Kodanda', '121983'];
         },
         _logoGradAnim2 = function () {
             d3.select( '#' + F1DataVis.IdStore.LogoNormal + "_1" )
@@ -111,7 +120,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
                 .duration( _transitionSpeed )
                 .attr( 'offset', '0%' )
                 .on( 'end', function () {
-                    if ( _localCheck ) {
+                    if ( _doAnimation ) {
                         _logoGradAnim3();
                     }
 
@@ -129,7 +138,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
                 .duration( _transitionSpeed )
                 .attr( 'offset', '0%' )
                 .on( 'end', function () {
-                    if ( _localCheck ) {
+                    if ( _doAnimation ) {
                         _logoGradAnim1();
                     }
                 } );
@@ -146,10 +155,17 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
                 .duration( _transitionSpeed )
                 .attr( 'offset', '0%' )
                 .on( 'end', function () {
-                    if ( _localCheck ) {
+                    if ( _doAnimation ) {
                         _logoGradAnim2();
                     }
                 } );
+        },
+        _checkMousePosition = function ( event ) {
+            var distance = Math.sqrt( Math.pow( event.clientX - _logoCenter.x, 2 ) + Math.pow( event.clientY - _logoCenter.y, 2 ) ), bufferRadius = _logoButtonPos.width / 2;
+            _transitionSpeed = 200;
+            if ( distance > bufferRadius) {
+                _transitionSpeed += 2 * ( distance - bufferRadius );
+            }
         };
 
     this.draw = function () {
@@ -158,6 +174,8 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _logoButtonPos.top = logoStyles.largeY - _logoButtonMargins.top;
         _logoButtonPos.width = logoStyles.largeWidth + _logoButtonMargins.left + _logoButtonMargins.right;
         _logoButtonPos.height = logoStyles.largeHeight + _logoButtonMargins.top + _logoButtonMargins.bottom;
+        _logoCenter.x = logoStyles.largeX + logoStyles.largeWidth / 2;
+        _logoCenter.y = logoStyles.largeY + logoStyles.largeHeight / 2;
         _initPositions();
         _buttonSVG = introGrp
             .append( 'g' )
@@ -170,8 +188,8 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
             .attr( 'y', 0 )
             .attr( 'width', _logoButtonPos.width )
             .attr( 'height', _logoButtonPos.height )
-            .attr( 'rx', _logoButtonPos.width * 0.1 )
-            .attr( 'ry', _logoButtonPos.height * 0.1 )
+            .attr( 'rx', _logoButtonPos.width * 0.2 )
+            .attr( 'ry', _logoButtonPos.height )
             .attr( 'fill', F1DataVis.IdStore.LogoNormalURL );
         _buttonSVG
             .append( 'rect' )
@@ -179,8 +197,8 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
             .attr( 'y', 5 )
             .attr( 'width', _logoButtonPos.width - 10 )
             .attr( 'height', _logoButtonPos.height - 10 )
-            .attr( 'rx', _logoButtonPos.width * 0.1 )
-            .attr( 'ry', _logoButtonPos.height * 0.1 )
+            .attr( 'rx', _logoButtonPos.width * 0.2 )
+            .attr( 'ry', _logoButtonPos.height )
             .attr( 'fill', F1DataVis.IdStore.LogoHoverURL );
 
         // Top texts
@@ -204,7 +222,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _topTextGrp
             .attr( 'transform', 'translate(' + _textPositions.topTextX + ',' + _textPositions.topTextY + ')' );
         yPos = textHeight * 0.75;
-        _textPositions.topTextGap = textHeight * 1.25;
+        _textPositions.topTextGap = textHeight * _textPositions.textGapFactor;
         for ( i = 0; i < length; i++ ) {
             textElements[i]
                 .attr( 'x', 0 )
@@ -233,7 +251,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _leftTextGrp
             .attr( 'transform', 'translate(' + _textPositions.leftTextX + ',' + _textPositions.leftTextY + ')' );
         yPos = textHeight * 0.75;
-        _textPositions.leftTextGap = textHeight * 1.25;
+        _textPositions.leftTextGap = textHeight * _textPositions.textGapFactor;
         for ( i = 0; i < length; i++ ) {
             textElements[i]
                 .attr( 'x', 0 )
@@ -245,25 +263,25 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         textElements = [];
         length = F1DataVis.Texts.DataCredit.length;
         _rightTextGrp = _introGrp
-            .append( 'a' )
-            .attr( 'href', 'https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020' )
-            .attr( 'target', '_blank' )
             .append( 'g' )
-            .attr( 'id', 'DataCreditTextGroup' )
-            .attr( 'cursor', 'pointer' )
-            .attr( 'class', F1DataVis.IdStore.dataCreditText )
-            .on( 'mouseover', function () {
-                this.classList.add( 'anchorHover' );
-            } )
-            .on( 'mouseout', function () {
-                this.classList.remove( 'anchorHover' );
-            } );
+            .attr( 'id', 'DataCreditTextGroup' );
         for ( i = 0; i < length; i++ ) {
             textElements.push( _rightTextGrp
+                .append( 'a' )
+                .attr( 'href', F1DataVis.Texts.DataCreditLinks[i] )
+                .attr( 'target', '_blank' )
                 .append( 'text' )
                 .attr( 'x', 0 )
                 .attr( 'y', 0 )
                 .attr( "text-anchor", _textPositions.rightTextAnchor )
+                .attr( 'cursor', 'pointer' )
+                .attr( 'class', F1DataVis.IdStore.dataCreditText )
+                .on( 'mouseover', function () {
+                    this.classList.add( 'anchorHover' );
+                } )
+                .on( 'mouseout', function () {
+                    this.classList.remove( 'anchorHover' );
+                } )
                 .text( F1DataVis.Texts.DataCredit[i] ) );
         }
         textHeight = textElements[0]._groups[0][0].getBBox().height;
@@ -272,7 +290,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _rightTextGrp
             .attr( 'transform', 'translate(' + _textPositions.rightTextX + ',' + _textPositions.rightTextY + ')' );
         yPos = textHeight * 0.75;
-        _textPositions.rightTextGap = textHeight * 1.25;
+        _textPositions.rightTextGap = textHeight * _textPositions.textGapFactor;
         for ( i = 0; i < length; i++ ) {
             textElements[i]
                 .attr( 'x', 0 )
@@ -297,11 +315,11 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         }
         textHeight = textElements[0]._groups[0][0].getBBox().height;
         totalHeight = ( length * textHeight ) + ( textHeight * 0.5 * ( length - 1 ) );
-        _textPositions.clickToStartTextY = _logoButtonPos.top + _logoButtonPos.height;
+        _textPositions.clickToStartTextY = _logoButtonPos.top + _logoButtonPos.height + _textPositions.margin.top / 2;
         _clickToStartTextGrp
             .attr( 'transform', 'translate(' + _textPositions.clickToStartTextX + ',' + _textPositions.clickToStartTextY + ')' );
         yPos = textHeight * 0.75;
-        _textPositions.clickToStartTextGap = textHeight * 1.25;
+        _textPositions.clickToStartTextGap = textHeight * _textPositions.textGapFactor;
         for ( i = 0; i < length; i++ ) {
             textElements[i]
                 .attr( 'x', 0 )
@@ -310,7 +328,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         }
 
         // Create personal introductions.
-        _textPositions.leftIntroTextY = _textPositions.rightIntroTextY = _textPositions.clickToStartTextY + yPos + _textPositions.introImageMargin;
+        _textPositions.leftIntroTextY = _textPositions.rightIntroTextY = _textPositions.clickToStartTextY + yPos;
         _textPositions.introImageSize = _visualizer.height - _textPositions.leftIntroTextY - _textPositions.margin.bottom;
         _textPositions.leftIntroTextX = _visualizer.width / 2 - _textPositions.introImageSize - _textPositions.introImageMargin / 2 - _textPositions.margin.right;
         _textPositions.rightIntroTextX = _visualizer.width / 2 + _textPositions.introImageSize + _textPositions.introImageMargin / 2 + _textPositions.margin.left;
@@ -318,7 +336,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _introGrp
             .append( 'path' )
             .attr( 'id', 'personalIntroDivider' )
-            .attr( "stroke-width", _textPositions.introImageMargin / 2 )
+            .attr( "stroke-width", _textPositions.introImageMargin / 4 )
             .attr( "stroke", '#dfdfdf' )
             .attr( "stroke-opacity", 0.5 )
             .attr( "stroke-dasharray", '15 10' )
@@ -332,6 +350,23 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
             .append( 'g' )
             .attr( 'id', 'RightIntroGroup' );
 
+        // Left intro photo
+        _leftIntroGrp
+            .append( 'image' )
+            .attr( 'x', _visualizer.width / 2 - _textPositions.introImageSize - _textPositions.introImageMargin / 2 )
+            .attr( 'y', _textPositions.leftIntroTextY )
+            .attr( 'height', _textPositions.introImageSize )
+            .attr( 'width', _textPositions.introImageSize )
+            .attr( 'href', './images/introPhotoAlk.jpg' );
+
+        // Right intro photo
+        _rightIntroGrp
+            .append( 'image' )
+            .attr( 'x', _visualizer.width / 2 + _textPositions.introImageMargin / 2 )
+            .attr( 'y', _textPositions.leftIntroTextY )
+            .attr( 'height', _textPositions.introImageSize )
+            .attr( 'width', _textPositions.introImageSize )
+            .attr( 'href', './images/introPhotoAlk.jpg' );
 
         // Left intro texts
         textElements = [];
@@ -354,7 +389,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _leftIntroTextGrp
             .attr( 'transform', 'translate(' + _textPositions.leftIntroTextX + ',' + _textPositions.leftIntroTextY + ')' );
         yPos = textHeight * 0.75;
-        _textPositions.leftIntroTextGap = textHeight * 1.25;
+        _textPositions.leftIntroTextGap = textHeight * _textPositions.textGapFactor;
         for ( i = 0; i < length; i++ ) {
             textElements[i]
                 .attr( 'x', 0 )
@@ -383,29 +418,22 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _rightIntroTextGrp
             .attr( 'transform', 'translate(' + _textPositions.rightIntroTextX + ',' + _textPositions.rightIntroTextY + ')' );
         yPos = textHeight * 0.75;
-        _textPositions.rightIntroTextGap = textHeight * 1.25;
+        _textPositions.rightIntroTextGap = textHeight * _textPositions.textGapFactor;
         for ( i = 0; i < length; i++ ) {
             textElements[i]
                 .attr( 'x', 0 )
                 .attr( 'y', yPos );
             yPos += _textPositions.rightIntroTextGap;
         }
-
     };
 
-    this.logoGradAnimCheck = function ( check ) {
-        _localCheck = check;
-        if ( _localCheck ) {
+    this.startStopAnim = function ( doAnimation ) {
+        _doAnimation = doAnimation;
+        if ( _doAnimation ) {
             _logoGradAnim2();
-        }
-    };
-
-    this.logoHoverStatus = function ( hoverStatus ) {
-        if ( hoverStatus ) {
-            _transitionSpeed = 300;
-        }
-        else {
-            _transitionSpeed = 1500;
+            d3.select( _visualizer.parentSvg).on( 'mousemove', _checkMousePosition );
+        } else {
+            d3.select( _visualizer.parentSvg ).on( 'mousemove', null );
         }
     };
 
