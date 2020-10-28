@@ -3,9 +3,6 @@ Reference slider - https://github.com/johnwalley/d3-simple-slider
 F1 image.
 
 
-
-- Start page with info and introduction of us.
-
 - Implement viridis - for colourblind.
 
 - Stylize lines
@@ -23,6 +20,7 @@ F1 image.
 - Handler glow animation for the paths. - Nah.
 
 
+- Start page with info and introduction of us. - Done.
 - Handler glow - Done
 - Add tooltip to show status, name and team name. - Done
 - Stylize fonts - done
