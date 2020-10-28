@@ -174,15 +174,22 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
             linearGrad.setAttributeNS( null, 'y2', '100%' );
 
             stopElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'stop' );
+            stopElement.setAttributeNS( null, 'id', F1DataVis.IdStore.LogoHover + '_1' );
             stopElement.setAttributeNS( null, 'offset', '0%' );
             stopElement.setAttributeNS( null, 'stop-color', '#061f37' );
             linearGrad.appendChild( stopElement );
 
             stopElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'stop' );
+            stopElement.setAttributeNS( null, 'id', F1DataVis.IdStore.LogoHover + '_2' );
             stopElement.setAttributeNS( null, 'offset', '100%' );
             stopElement.setAttributeNS( null, 'stop-color', 'Black' );
             linearGrad.appendChild( stopElement );
 
+            stopElement = document.createElementNS( 'http://www.w3.org/2000/svg', 'stop' );
+            stopElement.setAttributeNS( null, 'id', F1DataVis.IdStore.LogoHover + '_3' );
+            stopElement.setAttributeNS( null, 'offset', '100%' );
+            stopElement.setAttributeNS( null, 'stop-color', '#E70000' );
+            linearGrad.appendChild( stopElement );
 
             defs.appendChild( linearGrad );
 
@@ -290,7 +297,19 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
             .attr( 'width', _logoStyles.largeWidth )
             .attr( 'href', './images/F1-Logo.png' )
             .attr( 'cursor', 'pointer' )
-            .on( 'click', _onLogoClicked );
+            .on( 'click', _onLogoClicked )
+            .on( 'mouseover', function () {
+                d3.select( '#' + F1DataVis.IdStore.LogoHover + '_2' )
+                    .transition()
+                    .duration( 200 )
+                    .attr( 'offset', '50%' );
+            } )
+            .on( 'mouseout', function () {
+                d3.select( '#' + F1DataVis.IdStore.LogoHover + '_2' )
+                    .transition()
+                    .duration( 200 )
+                    .attr( 'offset', '100%' );
+            } );
 
         _visualizationGrp.attr( 'transform', 'translate(0,' + ( height * 1.5 ) + ')' );
     };
