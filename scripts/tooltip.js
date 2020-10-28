@@ -101,12 +101,12 @@ F1DataVis.tooltip = function ( parent, id, parentWidth, parentHeight ) {
             }
         }
         if ( newX + _width > _parentWidth ) {
-            _xPos = newX - _width;
+            _xPos = newX - _width - 10;
         } else {
             _xPos = newX;
         }
         if ( newY + _height > _parentHeight ) {
-            _yPos = newY - _height;
+            _yPos = newY - _height - 10;
         } else {
             _yPos = newY;
         }

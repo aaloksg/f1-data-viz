@@ -318,7 +318,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.drawRace = function ( race, negator ) {
-        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length, racialParams, group,
+        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length, racialParams, group, driverIds = [],
             lapScales = new Map(),
             translateFromAttr, translateToAttr,
             getXPositionOfLap;
@@ -426,9 +426,17 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         driverObjects.splice( i, 1 );
                         i--;
                         length--;
+                    } else {
+                        driverIds.push( driverObjects[i].driverId );
                     }
                 }
-
+                if ( numberOfDrivers > driverObjects.length ) {
+                    for ( driverId in drivers ) {
+                        if ( driverIds.indexOf( parseInt( driverId, 10 ) ) === -1 ) {
+                            driverObjects.push( F1DataVis.dataHandler.getDriversByID( parseInt( driverId, 10 ) ) );
+                        }
+                    }
+                }
                 lapRange = d3.range( 0, numberOfLaps + 1 );
                 getXPositionOfLap = d3.scalePoint( lapRange, [_marginProps.left, this.width - _marginProps.right] );
 

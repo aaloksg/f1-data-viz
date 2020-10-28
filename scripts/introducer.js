@@ -29,7 +29,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         },
         _textPositions = {
             margin: {
-                top: 20,
+                top: 50,
                 left: 50,
                 right: 50,
                 bottom: 60
@@ -88,9 +88,9 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _createTexts = function () {
             F1DataVis.Texts.ClickToStart = ['Click to start!'];
             F1DataVis.Texts.IntroTexts = [
-                'Welcome to our visualisation of F1 data ranging from 1996 to 2017.',
-                'We visualised the change in standings of teams in a season,',
-                'and the change of positions of drivers in a race.'
+                'F1 Data Visualisation (1996 to 2017)',
+                'A visualisation of the journeys of teams through seasons,',
+                'and the stories of drivers in each Grand Prix.'
             ];
             // [TODO] - Add hyperlink to DataCredit - https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020
             F1DataVis.Texts.DataCredit = [
@@ -105,8 +105,8 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
                 'Championships are won at the factory."',
                 '- Mercedes( 2019 )'
             ];
-            F1DataVis.Texts.LeftIntro = ['Aalok Shashidhar Gokhale', '121872'];
-            F1DataVis.Texts.RightIntro = ['Ankith Kodanda', '121983'];
+            F1DataVis.Texts.LeftIntro = ['Aalok Shashidhar Gokhale', '121872', 'aalok.shashidhar.gokhale@uni-weimar.de', 'Bauhaus-Universität', 'Weimar'];
+            F1DataVis.Texts.RightIntro = ['Ankith Kodanda', '121983', 'ankith.kodanda@uni-weimar.de', 'Bauhaus-Universität', 'Weimar'];
         },
         _logoGradAnim2 = function () {
             d3.select( '#' + F1DataVis.IdStore.LogoNormal + "_1" )
@@ -216,6 +216,8 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
                 .attr( "text-anchor", _textPositions.topTextAnchor )
                 .text( F1DataVis.Texts.IntroTexts[i] ) );
         }
+        textElements[0].attr( 'class', 'headingText' );
+
         textHeight = textElements[0]._groups[0][0].getBBox().height;
         totalHeight = ( length * textHeight ) + ( textHeight * 0.5 * ( length - 1 ) );
         _textPositions.topTextY = _logoButtonPos.top - _textPositions.margin.bottom - totalHeight;
@@ -315,7 +317,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         }
         textHeight = textElements[0]._groups[0][0].getBBox().height;
         totalHeight = ( length * textHeight ) + ( textHeight * 0.5 * ( length - 1 ) );
-        _textPositions.clickToStartTextY = _logoButtonPos.top + _logoButtonPos.height + _textPositions.margin.top / 2;
+        _textPositions.clickToStartTextY = _logoButtonPos.top + _logoButtonPos.height + _textPositions.margin.top / 4;
         _clickToStartTextGrp
             .attr( 'transform', 'translate(' + _textPositions.clickToStartTextX + ',' + _textPositions.clickToStartTextY + ')' );
         yPos = textHeight * 0.75;
@@ -328,7 +330,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         }
 
         // Create personal introductions.
-        _textPositions.leftIntroTextY = _textPositions.rightIntroTextY = _textPositions.clickToStartTextY + yPos;
+        _textPositions.leftIntroTextY = _textPositions.rightIntroTextY = _textPositions.clickToStartTextY + yPos + _textPositions.margin.top;
         _textPositions.introImageSize = _visualizer.height - _textPositions.leftIntroTextY - _textPositions.margin.top;
         _textPositions.leftIntroTextX = _visualizer.width / 2 - _textPositions.introImageSize - _textPositions.introImageMargin / 2 - _textPositions.margin.right;
         _textPositions.rightIntroTextX = _visualizer.width / 2 + _textPositions.introImageSize + _textPositions.introImageMargin / 2 + _textPositions.margin.left;
@@ -336,7 +338,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _introGrp
             .append( 'path' )
             .attr( 'id', 'personalIntroDivider' )
-            .attr( "stroke-width", _textPositions.introImageMargin / 4 )
+            .attr( "stroke-width", _textPositions.introImageMargin * 0.1 )
             .attr( "stroke", '#dfdfdf' )
             .attr( "stroke-opacity", 0.5 )
             .attr( "stroke-dasharray", '15 10' )
@@ -385,6 +387,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         }
         textHeight = textElements[0]._groups[0][0].getBBox().height;
         totalHeight = ( length * textHeight ) + ( textHeight * 0.5 * ( length - 1 ) );
+        _textPositions.leftIntroTextY = _textPositions.leftIntroTextY + _textPositions.introImageSize / 2 - totalHeight / 2;
 
         _leftIntroTextGrp
             .attr( 'transform', 'translate(' + _textPositions.leftIntroTextX + ',' + _textPositions.leftIntroTextY + ')' );
@@ -414,6 +417,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         }
         textHeight = textElements[0]._groups[0][0].getBBox().height;
         totalHeight = ( length * textHeight ) + ( textHeight * 0.5 * ( length - 1 ) );
+        _textPositions.rightIntroTextY = _textPositions.rightIntroTextY + _textPositions.introImageSize / 2 - totalHeight / 2;
 
         _rightIntroTextGrp
             .attr( 'transform', 'translate(' + _textPositions.rightIntroTextX + ',' + _textPositions.rightIntroTextY + ')' );
