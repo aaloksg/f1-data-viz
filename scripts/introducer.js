@@ -329,7 +329,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
 
         // Create personal introductions.
         _textPositions.leftIntroTextY = _textPositions.rightIntroTextY = _textPositions.clickToStartTextY + yPos;
-        _textPositions.introImageSize = _visualizer.height - _textPositions.leftIntroTextY - _textPositions.margin.bottom;
+        _textPositions.introImageSize = _visualizer.height - _textPositions.leftIntroTextY - _textPositions.margin.top;
         _textPositions.leftIntroTextX = _visualizer.width / 2 - _textPositions.introImageSize - _textPositions.introImageMargin / 2 - _textPositions.margin.right;
         _textPositions.rightIntroTextX = _visualizer.width / 2 + _textPositions.introImageSize + _textPositions.introImageMargin / 2 + _textPositions.margin.left;
 
@@ -341,7 +341,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
             .attr( "stroke-opacity", 0.5 )
             .attr( "stroke-dasharray", '15 10' )
             .attr( "fill", "none" )
-            .attr( "d", team => d3.line()( [[_visualizer.width / 2, _textPositions.leftIntroTextY], [_visualizer.width / 2, _visualizer.height - _textPositions.margin.bottom]] ) );
+            .attr( "d", team => d3.line()( [[_visualizer.width / 2, _textPositions.leftIntroTextY], [_visualizer.width / 2, _textPositions.leftIntroTextY + _textPositions.introImageSize ]] ) );
 
         _leftIntroGrp = _introGrp
             .append( 'g' )
@@ -357,7 +357,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
             .attr( 'y', _textPositions.leftIntroTextY )
             .attr( 'height', _textPositions.introImageSize )
             .attr( 'width', _textPositions.introImageSize )
-            .attr( 'href', './images/introPhotoAlk.jpg' );
+            .attr( 'href', './images/introPhotoAlk.png' );
 
         // Right intro photo
         _rightIntroGrp
@@ -366,7 +366,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
             .attr( 'y', _textPositions.leftIntroTextY )
             .attr( 'height', _textPositions.introImageSize )
             .attr( 'width', _textPositions.introImageSize )
-            .attr( 'href', './images/introPhotoAlk.jpg' );
+            .attr( 'href', './images/introPhotoAnk.png' );
 
         // Left intro texts
         textElements = [];
