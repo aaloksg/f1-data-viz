@@ -83,6 +83,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _animateRacePaths = function () {
             // Do animation
             self.drawRacePaths();
+            self.racialParams[_displayedRaceId].pathsDrawn = true;
         },
         _resetRacePaths = function () {
             if ( self.racialParams[_displayedRaceId] && self.racialParams[_displayedRaceId].paths ) {
@@ -100,9 +101,15 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             var negator = 0, race;
             if ( moveToPrev ) {
                 negator = 1;
+                if ( _displayedRaceIndex === 0 ) {
+                    return;
+                }
                 _displayedRaceIndex--;
             } else {
                 negator = -1;
+                if ( _displayedRaceIndex === self.seasonalParams[_displayedYear].races.length - 1 ) {
+                    return;
+                }
                 _displayedRaceIndex++;
             }
             race = self.seasonalParams[_displayedYear].races[_displayedRaceIndex];
@@ -343,14 +350,20 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
 
         if ( this.raceGrp[_displayedRaceId] ) {
             // Translate in the race if group already exists.
+            racialParams = this.racialParams[_displayedRaceId];
             this.raceGrp[_displayedRaceId]
                 .attr( 'transform', translateFromAttr )
                 .transition()
                 .duration( _transitionSpeed )
-                .attr( 'transform', translateToAttr );
+                .attr( 'transform', translateToAttr )
+                .on( 'end', function () {
+                    if ( racialParams.pathsDrawn === false ) {
+                        _animateRacePaths();
+                    }
+                });
             // Reset the race paths.
             //_resetRacePaths();
-            racialParams = this.racialParams[_displayedRaceId];
+
         } else {
             // Create the group for the displayed year.
 
@@ -385,7 +398,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             driverObjects = F1DataVis.dataHandler.getDriverObjByPolePositions( _displayedRaceId ); 
 
             this.racialParams[_displayedRaceId] = racialParams = {
-                drivers: [], driverObjects: [], numberOfLaps: 0, lapScales: [], getXPositionOfLap: undefined, paths: [], leftButtonPos: _leftButtonRestPos, rightButtonPos: _rightButtonRestPos, dashBoardBound: {}
+                drivers: [], driverObjects: [], numberOfLaps: 0, lapScales: [], getXPositionOfLap: undefined, paths: [], leftButtonPos: _leftButtonRestPos, rightButtonPos: _rightButtonRestPos, dashBoardBound: {}, pathsDrawn: false
             };
             if ( driverObjects === undefined ) {
                 this.raceGrp[_displayedRaceId]
@@ -393,7 +406,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     .transition()
                     .duration( _transitionSpeed )
                     .attr( 'transform', translateToAttr );
-
+                this.racialParams[_displayedRaceId].pathsDrawn = true;
                 //Append sad boy.
                 this.raceGrp[_displayedRaceId]
                     .append( 'image' )
@@ -682,14 +695,14 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 } )
                 .each( function ( driver ) {
                     var points = d3.range( 0, numberOfLaps + 1 ).map( lap => {
-                        var x = getXPositionOfLap( lap ), y, position;
+                        var x = getXPositionOfLap( lap ), y, position, statusId;
 
                         if ( lap === 0 ) {
                             y = self.getYCoordinateOfDriver( 0, _getDriverName( driver ) );
                         }
                         else {
                             if ( drivers[driver.driverId][lap - 1] === undefined ) {
-                                if ( drivers[driver.driverId][lap - 2] === undefined || lap === numberOfLaps ) {
+                                if ( drivers[driver.driverId][lap - 2] === undefined || (( statusId = F1DataVis.dataHandler.getResultDetails( _displayedRaceId, driver.driverId ).statusId ) > 10 && statusId < 20 ) ) {
                                     return null;
                                 }
                                 y = self.getYCoordinateOfDriver( lap, driverObjects.length );
