@@ -223,10 +223,11 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
                 _displayingVisualization = false;
                 self.introducer.startStopAnim( !_displayingVisualization );
                 _introGrp
-                    .attr( 'transform', 'translate(0,' + ( self.height * -1.5 ) + ')' )
+                    .attr( 'transform', 'translate(0,0)' )
+                    .attr( 'opacity', 0 )
                     .transition()
                     .duration( _transitionSpeed )
-                    .attr( 'transform', 'translate(0,0)' );
+                    .attr( 'opacity', 1 );
                 _visualizationGrp
                     .attr( 'transform', 'translate(0,0)' )
                     .transition()
@@ -244,10 +245,13 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
                 _displayingVisualization = true;
                 self.introducer.startStopAnim( !_displayingVisualization );
                 _introGrp
-                    .attr( 'transform', 'translate(0,0)' )
+                    .attr( 'opacity', 1 )
                     .transition()
                     .duration( _transitionSpeed )
-                    .attr( 'transform', 'translate(0,' + ( self.height * -1.5 ) + ')' );
+                    .attr( 'opacity', 0 )
+                    .on( 'end', function () {
+                        _introGrp.attr( 'transform', 'translate(0,' + ( self.height * -1.5 ) + ')' );
+                    } );
                 _visualizationGrp
                     .attr( 'transform', 'translate(0,' + ( self.height * 1.5 ) + ')' )
                     .transition()
@@ -323,6 +327,13 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
         this.sliderMoved( this.slider.getValue() );
         this.introducer.draw();
         this.introducer.startStopAnim( !_displayingVisualization );
+
+        // Transition intro group in.
+        _introGrp
+            .attr( 'opacity', 0 )
+            .transition()
+            .duration( 2 * _transitionSpeed )
+            .attr( 'opacity', 1 );
     };
 
     this.update = function ( width, height ) {
