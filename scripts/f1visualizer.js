@@ -27,7 +27,7 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
         _transitionSpeed = 1500,
         _displayingVisualization = false,
         _f1Logo,
-        _logoStyles = { smallWidth: 75, smallHeight: 75, largeWidth: 250, largeHeight: 0, smallX: 0, smallY: 0, largeX: 0, largeY: 0 },
+        _logoStyles = { smallWidth: 75, smallHeight: 75, largeWidth: 0, largeHeight: 0, smallX: 0, smallY: 0, largeX: 0, largeY: 0 },
         _createStyles = function () {
             var defs = document.getElementById( F1DataVis.IdStore.defs ), linearGrad, stopElement;
             // Normal gradient
@@ -285,6 +285,7 @@ F1DataVis.f1Visualizer = function ( parentSvg ) {
         this.parallelCoords = new F1DataVis.paraCoorder( _visualizationGrp, this );
         this.introducer = new F1DataVis.introducer( _introGrp, _logoStyles, this );
         _createStyles();
+        _logoStyles.largeWidth = this.width / 5;
         _logoStyles.largeHeight = _logoStyles.largeWidth / 16 * 9;
         _logoStyles.largeX = width / 2 - _logoStyles.largeWidth / 2;
         _logoStyles.largeY = height / 2 - _logoStyles.largeHeight * 0.75;
