@@ -24,7 +24,7 @@ F1DataVis.tooltip = function ( parent, id, parentWidth, parentHeight ) {
         _init = function () {
             var length = _texts.length, i;
             // Create group for slider and append to main svg
-            _tooltipSvg = d3.select( _parent )
+            _tooltipSvg = _parent
                 .append( 'g' )
                 .attr( 'id', _id )
                 .attr( 'class', F1DataVis.IdStore.tooltipClass )
@@ -101,12 +101,12 @@ F1DataVis.tooltip = function ( parent, id, parentWidth, parentHeight ) {
             }
         }
         if ( newX + _width > _parentWidth ) {
-            _xPos = newX - _width;
+            _xPos = newX - _width - 10;
         } else {
             _xPos = newX;
         }
         if ( newY + _height > _parentHeight ) {
-            _yPos = newY - _height;
+            _yPos = newY - _height - 10;
         } else {
             _yPos = newY;
         }

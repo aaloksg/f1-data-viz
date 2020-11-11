@@ -1,8 +1,7 @@
+Data - https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020
 Reference slider - https://github.com/johnwalley/d3-simple-slider
+F1 image.
 
-
-
-- Start page with info and introduction of us.
 
 - Implement viridis - for colourblind.
 
@@ -21,6 +20,7 @@ Reference slider - https://github.com/johnwalley/d3-simple-slider
 - Handler glow animation for the paths. - Nah.
 
 
+- Start page with info and introduction of us. - Done.
 - Handler glow - Done
 - Add tooltip to show status, name and team name. - Done
 - Stylize fonts - done

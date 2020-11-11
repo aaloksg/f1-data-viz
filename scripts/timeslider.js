@@ -25,19 +25,19 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
         _tweakSliderLook = function () {
             // Modify the slider styles.
             // Make tick lines invisible.
-            d3.select( _parent )
+            _parent
                 .selectAll( '.tick line' )
                 .attr( 'opacity', 0 );
 
             // Change font of tick labels.
-            d3.select( _parent )
+            _parent
                 .selectAll( '.axis text' )
                 .attr( 'font-size', 14 )
                 .attr( 'font-family', 'bahnschrift' )
                 .attr( 'fill', '#E70000' );
 
             // Change font of pointer label.
-            d3.select( _parent )
+            _parent
                 .selectAll( '.parameter-value text' )
                 .attr( 'font-size', 22 )
                 //.attr('font-style', 'italic')
@@ -56,15 +56,15 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
                 } );
 
             // Change slider size.
-            d3.select( _parent )
+            _parent
                 .selectAll( '.track' )
                 .attr( 'stroke-width', 14 )
                 .attr( 'stroke', '#E70000' );
-            d3.select( _parent )
+            _parent
                 .selectAll( '.track-inset' )
                 .attr( 'stroke-width', 7 )
                 .attr( 'stroke', '#005AD4' );
-            d3.select( _parent )
+            _parent
                 .selectAll( '.handle' )
                 .attr( 'cursor', 'grab' )
                 .attr( 'stroke-width', 3 )
@@ -106,7 +106,7 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
 
 
     this.drawDashBoard = function () {
-        _sliderGroup = d3.select( _parent )
+        _sliderGroup = _parent
             .insert( 'g', ":first-child" )
             .attr( 'id', F1DataVis.IdStore.sliderDash );
         _dashBoard = _sliderGroup
@@ -139,7 +139,7 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
     this.draw = function () {
 
         // Create group for slider and append to main svg
-        _sliderGroup = d3.select( _parent )
+        _sliderGroup = _parent
             .append( 'g' )
             .attr( 'id', F1DataVis.IdStore.sliderParent );
 
@@ -168,13 +168,6 @@ F1DataVis.timeSlider = function ( parent, visualizer ) {
         _xPos = this.xPosition + _marginProps.left;
         _sliderGroup.attr( 'transform', 'translate(' + _xPos + ',' + _yPos + ')' );
         this.drawDashBoard();
-        _sliderGroup.append( 'image' )
-            .attr( 'x', 0 )
-            .attr( 'y', this.yPosition )
-            .attr( 'height', 75 )
-            .attr( 'width',75 )
-            .attr( 'href', './images/F1-Logo.png' );
-
     };
 
     this.update = function () {

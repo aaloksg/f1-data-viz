@@ -1,5 +1,6 @@
 var F1DataVis = F1DataVis || {};
 F1DataVis.IdStore = F1DataVis.IdStore || {};
+F1DataVis.Texts = F1DataVis.Texts || {};
 F1DataVis.IdStore.paracoordHolder = 'paracoordHolderGrp'
 F1DataVis.IdStore.paracoordParentGrp = 'paracoordParentGrp';
 F1DataVis.IdStore.paracoordClipper = 'paracoordClipper';
@@ -7,9 +8,9 @@ F1DataVis.IdStore.highlightedElementClass = 'highlighted';
 F1DataVis.IdStore.highlightableElementClass = 'highlightableElement';
 F1DataVis.IdStore.dehighlightedGroupClass = 'deHilightedGroup';
 F1DataVis.IdStore.highlightablePathClass = 'highlightablePath';
-F1DataVis.IdStore.ApologyMessage1 = 'We are sorry! The data for the';
-F1DataVis.IdStore.ApologyMessage2 = 'does not exist.';
-F1DataVis.IdStore.tooltip = 'F1DataVisTooltip';
+F1DataVis.Texts.ApologyMessage1 = 'We are sorry! The data for the';
+F1DataVis.Texts.ApologyMessage2 = 'does not exist.';
+F1DataVis.Texts.tooltip = 'F1DataVisTooltip';
 
 F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     var self = this,
@@ -40,9 +41,9 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _leftButtonRestPos,
         _rightButtonRestPos,
         _buttonYPos,
-        _apologyMessage = [F1DataVis.IdStore.ApologyMessage1, '', F1DataVis.IdStore.ApologyMessage2],
+        _apologyMessage = [F1DataVis.Texts.ApologyMessage1, '', F1DataVis.Texts.ApologyMessage2],
         _initializeClipping = function () {
-            _clipRect = d3.select( _paracoordParentGrp )
+            _clipRect = _paracoordParentGrp
                 .append( 'clipPath' )
                 .attr( 'id', F1DataVis.IdStore.paracoordClipper )
                 .append( 'rect' );
@@ -51,7 +52,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 .attr( 'y', _clippingProps.top )
                 .attr( 'height', self.height - _clippingProps.top - _clippingProps.bottom )
                 .attr( 'width', self.width - _clippingProps.left - _clippingProps.right );
-            d3.select( _paracoordHolder )
+            _paracoordHolder
                 .attr( 'clip-path', 'url(#' + F1DataVis.IdStore.paracoordClipper + ')' );
         },
         _translateSeasonOut = function ( negator ) {
@@ -82,6 +83,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
         _animateRacePaths = function () {
             // Do animation
             self.drawRacePaths();
+            self.racialParams[_displayedRaceId].pathsDrawn = true;
         },
         _resetRacePaths = function () {
             if ( self.racialParams[_displayedRaceId] && self.racialParams[_displayedRaceId].paths ) {
@@ -99,9 +101,15 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             var negator = 0, race;
             if ( moveToPrev ) {
                 negator = 1;
+                if ( _displayedRaceIndex === 0 ) {
+                    return;
+                }
                 _displayedRaceIndex--;
             } else {
                 negator = -1;
+                if ( _displayedRaceIndex === self.seasonalParams[_displayedYear].races.length - 1 ) {
+                    return;
+                }
                 _displayedRaceIndex++;
             }
             race = self.seasonalParams[_displayedYear].races[_displayedRaceIndex];
@@ -128,12 +136,12 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     this.initialize = function ( width, height ) {
         this.width = width;
         this.height = height;
-        _paracoordParentGrp = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
-        _paracoordParentGrp.setAttributeNS( null, 'id', F1DataVis.IdStore.paracoordParentGrp );
-        _svgParent.appendChild( _paracoordParentGrp );
-        _paracoordHolder = document.createElementNS( "http://www.w3.org/2000/svg", "g" );
-        _paracoordHolder.setAttributeNS( null, 'id', F1DataVis.IdStore.paracoordHolder );
-        _paracoordParentGrp.appendChild( _paracoordHolder );
+        _paracoordParentGrp = _svgParent
+            .append( 'g' )
+            .attr( 'id', F1DataVis.IdStore.paracoordParentGrp );
+        _paracoordHolder = _paracoordParentGrp
+            .append( 'g' )
+            .attr( 'id', F1DataVis.IdStore.paracoordHolder );
         _initializeClipping();
 
         _buttonYPos = this.height - _buttonSize * 0.8;
@@ -234,7 +242,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 );
             } );
 
-            this.seasonalGrp[_displayedYear] = d3.select( _paracoordHolder )
+            this.seasonalGrp[_displayedYear] = _paracoordHolder
                 .append( "g" )
                 .attr( 'id', 'group_year_' + _displayedYear );
 
@@ -317,7 +325,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
     };
 
     this.drawRace = function ( race, negator ) {
-        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length, racialParams, group,
+        var laps, lapRange, lap, numberOfLaps = 0, drivers = {}, numberOfDrivers = 0, driverObjects = [], driverId, orderedDrivers, verticalAxisRange, verticalAxisDomain, i, length, racialParams, group, driverIds = [],
             lapScales = new Map(),
             translateFromAttr, translateToAttr,
             getXPositionOfLap;
@@ -342,18 +350,24 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
 
         if ( this.raceGrp[_displayedRaceId] ) {
             // Translate in the race if group already exists.
+            racialParams = this.racialParams[_displayedRaceId];
             this.raceGrp[_displayedRaceId]
                 .attr( 'transform', translateFromAttr )
                 .transition()
                 .duration( _transitionSpeed )
-                .attr( 'transform', translateToAttr );
+                .attr( 'transform', translateToAttr )
+                .on( 'end', function () {
+                    if ( racialParams.pathsDrawn === false ) {
+                        _animateRacePaths();
+                    }
+                });
             // Reset the race paths.
             //_resetRacePaths();
-            racialParams = this.racialParams[_displayedRaceId];
+
         } else {
             // Create the group for the displayed year.
 
-            this.raceGrp[_displayedRaceId] = d3.select( _paracoordHolder )
+            this.raceGrp[_displayedRaceId] = _paracoordHolder
                 .append( "g" )
                 .attr( 'id', 'group_race_' + _displayedRaceId );
 
@@ -384,7 +398,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
             driverObjects = F1DataVis.dataHandler.getDriverObjByPolePositions( _displayedRaceId ); 
 
             this.racialParams[_displayedRaceId] = racialParams = {
-                drivers: [], driverObjects: [], numberOfLaps: 0, lapScales: [], getXPositionOfLap: undefined, paths: [], leftButtonPos: _leftButtonRestPos, rightButtonPos: _rightButtonRestPos, dashBoardBound: {}
+                drivers: [], driverObjects: [], numberOfLaps: 0, lapScales: [], getXPositionOfLap: undefined, paths: [], leftButtonPos: _leftButtonRestPos, rightButtonPos: _rightButtonRestPos, dashBoardBound: {}, pathsDrawn: false
             };
             if ( driverObjects === undefined ) {
                 this.raceGrp[_displayedRaceId]
@@ -392,7 +406,7 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                     .transition()
                     .duration( _transitionSpeed )
                     .attr( 'transform', translateToAttr );
-
+                this.racialParams[_displayedRaceId].pathsDrawn = true;
                 //Append sad boy.
                 this.raceGrp[_displayedRaceId]
                     .append( 'image' )
@@ -425,9 +439,17 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                         driverObjects.splice( i, 1 );
                         i--;
                         length--;
+                    } else {
+                        driverIds.push( driverObjects[i].driverId );
                     }
                 }
-
+                if ( numberOfDrivers > driverObjects.length ) {
+                    for ( driverId in drivers ) {
+                        if ( driverIds.indexOf( parseInt( driverId, 10 ) ) === -1 ) {
+                            driverObjects.push( F1DataVis.dataHandler.getDriversByID( parseInt( driverId, 10 ) ) );
+                        }
+                    }
+                }
                 lapRange = d3.range( 0, numberOfLaps + 1 );
                 getXPositionOfLap = d3.scalePoint( lapRange, [_marginProps.left, this.width - _marginProps.right] );
 
@@ -673,14 +695,14 @@ F1DataVis.paraCoorder = function ( svgParent, visualizer ) {
                 } )
                 .each( function ( driver ) {
                     var points = d3.range( 0, numberOfLaps + 1 ).map( lap => {
-                        var x = getXPositionOfLap( lap ), y, position;
+                        var x = getXPositionOfLap( lap ), y, position, statusId;
 
                         if ( lap === 0 ) {
                             y = self.getYCoordinateOfDriver( 0, _getDriverName( driver ) );
                         }
                         else {
                             if ( drivers[driver.driverId][lap - 1] === undefined ) {
-                                if ( drivers[driver.driverId][lap - 2] === undefined || lap === numberOfLaps ) {
+                                if ( drivers[driver.driverId][lap - 2] === undefined || (( statusId = F1DataVis.dataHandler.getResultDetails( _displayedRaceId, driver.driverId ).statusId ) > 10 && statusId < 20 ) ) {
                                     return null;
                                 }
                                 y = self.getYCoordinateOfDriver( lap, driverObjects.length );
