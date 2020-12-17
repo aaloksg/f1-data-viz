@@ -7,7 +7,8 @@ var dataParser = function () {
                 console.log(results);
                 this.downloadJSON(results.data, file.name);
             }.bind(this),
-            dynamicTyping: function (headerName) {
+            dynamicTyping: function ( headerName ) {
+                // Use this array to enter header names that contain numerical data nad must be parsed as numbers in JSON, not as string.
                 var numericalHeaders = ['circuitId', 'lat', 'lng', 'alt', 'raceId', 'year', 'round', 'constructorId', 'driverId', 'number', 'driverStandingsId', 'points', 'position', 'wins', 'constructorStandingsId', 'resultId', 'grid', 'positionOrder', 'laps', 'fastestLap', 'milliseconds', 'rank', 'fastestLapSpeed', 'statusId', 'lap', 'statusId'];
                 return numericalHeaders.indexOf(headerName) >= 0;
             }
