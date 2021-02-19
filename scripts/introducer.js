@@ -71,6 +71,8 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         _clickToStartTextGrp,
         _leftIntroGrp,
         _rightIntroGrp,
+        _leftIntroAnchorGrp,
+        _rightIntroAnchorGrp,
         _leftIntroTextGrp,
         _rightIntroTextGrp,
         _initPositions = function () {
@@ -169,7 +171,7 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
         };
 
     this.draw = function () {
-        var length, i, textElements, textHeight = 0, yPos = 0, totalHeight;
+        var length, i, textElements, textHeight = 0, yPos = 0, totalHeight, anchor, outerRectSize = 10, innerRectSize = 5;
         _logoButtonPos.left = logoStyles.largeX - _logoButtonMargins.left;
         _logoButtonPos.top = logoStyles.largeY - _logoButtonMargins.top;
         _logoButtonPos.width = logoStyles.largeWidth + _logoButtonMargins.left + _logoButtonMargins.right;
@@ -352,8 +354,55 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
             .append( 'g' )
             .attr( 'id', 'RightIntroGroup' );
 
+        _leftIntroAnchorGrp = _leftIntroGrp
+            .append( 'g' )
+            .attr( 'id', 'LeftIntroAnchorGroup' )
+            .attr( 'fill-opacity', 0 )
+            .attr( 'cursor', 'pointer' )
+            .on( 'mouseover', function () {
+                _leftIntroAnchorGrp.attr( 'fill-opacity', 1 );
+            } )
+            .on( 'mouseout', function () {
+                _leftIntroAnchorGrp.attr( 'fill-opacity', 0 );
+            } );
+
+        _rightIntroAnchorGrp = _rightIntroGrp
+            .append( 'g' )
+            .attr( 'id', 'RightIntroAnchorGroup' )
+            .attr( 'fill-opacity', 0 )
+            .attr( 'cursor', 'pointer' )
+            .on( 'mouseover', function () {
+                _rightIntroAnchorGrp.attr( 'fill-opacity', 1 );
+            } )
+            .on( 'mouseout', function () {
+                _rightIntroAnchorGrp.attr( 'fill-opacity', 0 );
+            } );
+
         // Left intro photo
-        _leftIntroGrp
+        anchor = _leftIntroAnchorGrp
+            .append( 'a' )
+            .attr( 'href', 'https://www.linkedin.com/in/aalok-gokhale-b2031560/' )
+            .attr( 'target', '_blank' );
+
+        anchor
+            .append( 'rect' )
+            .attr( 'x', _visualizer.width / 2 - _textPositions.introImageSize - _textPositions.introImageMargin / 2 - outerRectSize / 2 )
+            .attr( 'y', _textPositions.leftIntroTextY - outerRectSize / 2 )
+            .attr( 'height', _textPositions.introImageSize + outerRectSize )
+            .attr( 'width', _textPositions.introImageSize + outerRectSize )
+            .attr( 'ry', _textPositions.introImageSize + outerRectSize )
+            .attr( 'rx', _textPositions.introImageSize + outerRectSize )
+            .attr( 'fill', '#dfdfdf' );
+        anchor
+            .append( 'rect' )
+            .attr( 'x', _visualizer.width / 2 - _textPositions.introImageSize - _textPositions.introImageMargin / 2 - innerRectSize / 2 )
+            .attr( 'y', _textPositions.leftIntroTextY - innerRectSize / 2 )
+            .attr( 'height', _textPositions.introImageSize + innerRectSize )
+            .attr( 'width', _textPositions.introImageSize + innerRectSize )
+            .attr( 'ry', _textPositions.introImageSize + innerRectSize )
+            .attr( 'rx', _textPositions.introImageSize + innerRectSize )
+            .attr( 'fill', 'url(#LogoNormal_gradient)' );
+        anchor
             .append( 'image' )
             .attr( 'x', _visualizer.width / 2 - _textPositions.introImageSize - _textPositions.introImageMargin / 2 )
             .attr( 'y', _textPositions.leftIntroTextY )
@@ -362,7 +411,29 @@ F1DataVis.introducer = function ( introGrp, logoStyles, visualizer ) {
             .attr( 'href', './images/introPhotoAlk.png' );
 
         // Right intro photo
-        _rightIntroGrp
+        anchor = _rightIntroAnchorGrp
+            .append( 'a' )
+            .attr( 'href', 'https://www.linkedin.com/in/ankith-kodanda-3365b3103' )
+            .attr( 'target', '_blank' );
+        anchor
+            .append( 'rect' )
+            .attr( 'x', _visualizer.width / 2 + _textPositions.introImageMargin / 2 - outerRectSize / 2 )
+            .attr( 'y', _textPositions.leftIntroTextY - outerRectSize / 2 )
+            .attr( 'height', _textPositions.introImageSize + outerRectSize )
+            .attr( 'width', _textPositions.introImageSize + outerRectSize )
+            .attr( 'ry', _textPositions.introImageSize + outerRectSize )
+            .attr( 'rx', _textPositions.introImageSize + outerRectSize )
+            .attr( 'fill', '#dfdfdf' );
+        anchor
+            .append( 'rect' )
+            .attr( 'x', _visualizer.width / 2 + _textPositions.introImageMargin / 2 - innerRectSize / 2 )
+            .attr( 'y', _textPositions.leftIntroTextY - innerRectSize / 2 )
+            .attr( 'height', _textPositions.introImageSize + innerRectSize )
+            .attr( 'width', _textPositions.introImageSize + innerRectSize )
+            .attr( 'ry', _textPositions.introImageSize + innerRectSize )
+            .attr( 'rx', _textPositions.introImageSize + innerRectSize )
+            .attr( 'fill', 'url(#LogoNormal_gradient)' );
+        anchor
             .append( 'image' )
             .attr( 'x', _visualizer.width / 2 + _textPositions.introImageMargin / 2 )
             .attr( 'y', _textPositions.leftIntroTextY )
