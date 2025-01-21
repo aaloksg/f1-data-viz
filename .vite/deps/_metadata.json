@@ -1,0 +1,25 @@
+{
+  "hash": "e15755ea",
+  "configHash": "21db3331",
+  "lockfileHash": "5ad5f6ac",
+  "browserHash": "ae9bfdcb",
+  "optimized": {
+    "d3": {
+      "src": "../../node_modules/d3/src/index.js",
+      "file": "d3.js",
+      "fileHash": "f0a9764a",
+      "needsInterop": false
+    },
+    "d3-simple-slider": {
+      "src": "../../node_modules/d3-simple-slider/src/index.js",
+      "file": "d3-simple-slider.js",
+      "fileHash": "ab0255e5",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-K7HBCA7D": {
+      "file": "chunk-K7HBCA7D.js"
+    }
+  }
+}
