@@ -1,3 +1,3 @@
 export default {
-    base: '/fi-data-viz/',
+    base: '/f1-data-viz/',
 };
