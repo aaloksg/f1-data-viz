@@ -1,0 +1,219 @@
+svg {
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    background-color: #061f37;
+}
+
+.axisLabels path:not(.highlightableElement) {
+    stroke: #E70000;
+    stroke-width: 2;
+}
+
+.axisLabels text {
+    font-family: Bahnschrift;
+    font-style: italic;
+    font-weight: bold;
+    fill: #005AD4;
+    stroke-width: 0.5px;
+    font-size: 15px;
+    text-shadow: 0px 0px 4px black;
+}
+
+.rightAxisLabels path:not(.highlightableElement) {
+    stroke: #E70000;
+    stroke-width: 2;
+}
+
+.rightAxisLabels text {
+    font-family: Bahnschrift;
+    font-style: italic;
+    font-weight: bold;
+    fill: #E70000;
+    stroke-width: 0.5px;
+    font-size: 15px;
+    text-shadow: 0px 0px 4px black;
+}
+
+.axisXLabels text {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #005AD4;
+    stroke-width: 0.5px;
+    font-size: 10px;
+    font-style: normal;
+    text-shadow: 0px 0px 4px black;
+}
+
+.axisXLabels.first text {
+    fill: #E70000;
+    font-size: 12px;
+}
+
+.raceNameText {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #dfdfdf;
+    font-size: 30px;
+    font-style: normal;
+}
+
+.apologyText {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #dfdfdf;
+    font-size: 30px;
+    font-style: normal;
+}
+
+.button rect {
+    fill: url(#ButtonNormal_Gradient);
+}
+
+.button.onHover rect {
+    fill: url(#ButtonHover_Gradient);
+}
+
+.button.onPressed rect {
+    fill: url(#ButtonPressed_Gradient);
+}
+
+.highlighted .highlightableElement {
+    /*    stroke-opacity: 0.25;*/
+    animation: raceaxis-anim-glow 1s ease infinite;
+}
+
+.highlighted .highlightableText {
+    stroke: #E70000;
+    animation: anim-glow 1s ease infinite;
+}
+
+.highlightedPath {
+    stroke-opacity: 1;
+}
+
+.deHilightedGroup {
+    stroke-opacity: 0.25;
+}
+
+    .deHilightedGroup .highlightablePath {
+        stroke-opacity: 1;
+    }
+
+.shadow {
+    filter: drop-shadow( 0 4px 3px red );
+}
+
+@keyframes anim-glow {
+    0% {
+        stroke-width: 1;
+        stroke-opacity: 1;
+    }
+
+    50% {
+        stroke-width: 9;
+        stroke-opacity: 0;
+    }
+
+    100% {
+        stroke-width: 3;
+        stroke-opacity: 1;
+    }
+}
+
+@keyframes handle-anim-glow {
+    0% {
+        stroke-width: 3;
+        stroke-opacity: 1;
+    }
+
+    50% {
+        stroke-width: 8;
+        stroke-opacity: 0.6;
+    }
+
+    100% {
+        stroke-width: 3;
+        stroke-opacity: 1;
+    }
+}
+
+
+@keyframes raceaxis-anim-glow {
+    0% {
+        stroke-width: 20;
+        stroke-opacity: 0.5;
+    }
+
+    50% {
+        stroke-width: 15;
+        stroke-opacity: 0;
+    }
+
+    100% {
+        stroke-width: 20;
+        stroke-opacity: 0.5;
+    }
+}
+
+.handle {
+    animation: handle-anim-glow 1s ease infinite;
+}
+
+
+.introText {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #dfdfdf;
+    font-size: 20px;
+    font-style: normal;
+    text-shadow: 0px 0px 4px black;
+}
+
+    .introText .headingText {
+        font-size: 25px;
+        fill: #dfdfdf;
+    }
+
+.quoteText {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #005AD4;
+    font-size: 18px;
+    font-style: italic;
+    text-shadow: 0px 0px 4px black;
+}
+
+.dataCreditText {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #005AD4;
+    font-size: 14px;
+    font-style: normal;
+    text-shadow: 0px 0px 4px black;
+}
+
+    .dataCreditText.anchorHover {
+        font-family: Bahnschrift;
+        font-weight: bold;
+        fill: #E70000;
+        font-style: italic;
+    }
+
+.clickToStartText {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #E70000;
+    font-size: 16px;
+    font-style: normal;
+    text-shadow: 0px 0px 4px black;
+}
+
+.personalIntroText {
+    font-family: Bahnschrift;
+    font-weight: bold;
+    fill: #dfdfdf;
+    font-size: 12px;
+    font-style: normal;
+    text-shadow: 0px 0px 4px black;
+}
